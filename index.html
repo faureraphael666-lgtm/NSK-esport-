@@ -12,7 +12,6 @@
 body{
 background:radial-gradient(circle,#2b0050,#0a0014);
 color:white;
-overflow-x:hidden;
 }
 
 /* GALAXIE */
@@ -28,24 +27,9 @@ header{
 text-align:center;
 padding:20px;
 background:rgba(0,0,0,0.6);
-backdrop-filter:blur(10px);
 }
 
-h1{color:#a855f7;font-size:28px;}
-
-/* HERO */
-.hero{text-align:center;margin-top:20px;}
-
-.glitch{
-font-size:45px;
-animation:glitch 1.5s infinite;
-}
-
-@keyframes glitch{
-0%{text-shadow:2px 2px #8a2be2,-2px -2px #ff00ff;}
-50%{text-shadow:-2px 2px #8a2be2,2px -2px #ff00ff;}
-100%{text-shadow:2px -2px #8a2be2,-2px 2px #ff00ff;}
-}
+h1{color:#a855f7;font-size:30px;}
 
 /* SYSTEM */
 .system{
@@ -55,41 +39,55 @@ align-items:center;
 padding:20px;
 }
 
-/* INPUT */
-input{
-padding:14px;
-border:none;
-border-radius:12px;
-margin:8px;
-width:260px;
+/* PSEUDO */
+#pseudo{
+padding:18px;
+font-size:20px;
+width:90%;
+max-width:400px;
+border-radius:15px;
 text-align:center;
+margin-bottom:15px;
 }
 
-/* BUTTON */
+/* TOURNOI (JUSTE SOUS PSEUDO) */
+.tournament-box{
+width:90%;
+max-width:700px;
+background:#111;
+padding:25px;
+border-radius:20px;
+border:1px solid #8a2be244;
+box-shadow:0 0 25px #8a2be233;
+text-align:center;
+margin-bottom:20px;
+}
+
+/* BOUTONS */
 button{
-padding:14px 24px;
-margin:8px;
+padding:16px 30px;
+font-size:18px;
+margin:10px;
 border:none;
-border-radius:12px;
+border-radius:15px;
 cursor:pointer;
 transition:0.3s;
-font-size:15px;
 }
 
-button:hover{transform:scale(1.08);}
+button:hover{transform:scale(1.1);}
 
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
 .admin{background:gold;color:black;display:none;}
 
-/* BLOCS (FIX DEFINITIF) */
+/* GRID */
 .main-grid{
 display:flex;
 flex-direction:column;
 align-items:center;
 gap:25px;
 width:100%;
-margin-top:40px;
+margin-top:20px;
 }
 
 .box{
@@ -104,19 +102,10 @@ box-shadow:0 0 25px #8a2be233;
 font-size:18px;
 }
 
-.box h3{
-margin-bottom:15px;
-color:#a855f7;
-}
+.box h3{color:#a855f7;margin-bottom:10px;}
 
-ul{list-style:none;font-size:18px;}
+ul{list-style:none;}
 li{margin:6px 0;}
-
-/* TOURNOI */
-.tournament{
-font-size:18px;
-text-align:center;
-}
 
 /* FORM */
 #tournamentForm{
@@ -134,14 +123,12 @@ margin-top:10px;
 <h1>Xeno eSport</h1>
 </header>
 
-<section class="hero">
-<h2 class="glitch">Xeno eSport</h2>
-<p>Gestion team & tournoi</p>
-</section>
-
 <section class="system">
 
-<input id="pseudo" placeholder="Pseudo">
+<input id="pseudo" placeholder="Entre ton pseudo">
+
+<!-- TOURNOI ICI -->
+<div id="tournament" class="tournament-box"></div>
 
 <div>
 <button class="present" onclick="setPresence(true)">Présent</button>
@@ -177,11 +164,6 @@ margin-top:10px;
 <ul id="absentList"></ul>
 </div>
 
-<div class="box">
-<h3>🏆 Tournoi</h3>
-<div id="tournament" class="tournament"></div>
-</div>
-
 </div>
 
 <script type="module">
@@ -189,7 +171,6 @@ margin-top:10px;
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphI",
   authDomain: "xeno-esport.firebaseapp.com",
@@ -213,20 +194,16 @@ present:isPresent
 // LIVE PLAYERS
 onSnapshot(collection(db,"players"),(snap)=>{
 let present=[], absent=[];
-
 snap.forEach(d=>{
 let data=d.data();
-if(data.present) present.push(data.name);
-else absent.push(data.name);
+data.present ? present.push(data.name) : absent.push(data.name);
 });
-
 presentList.innerHTML = present.map(p=>"<li>"+p+"</li>").join("");
 absentList.innerHTML = absent.map(p=>"<li>"+p+"</li>").join("");
 });
 
 // TOURNOI SAVE
 window.saveTournament = async function(){
-
 let t={
 name:tourName.value,
 date:tourDate.value,
@@ -234,22 +211,20 @@ time:tourTime.value,
 game:tourGame.value,
 players:tourPlayers.value
 };
-
 await setDoc(doc(db,"global","tournoi"),t);
-
-alert("Tournoi sauvegardé ✅");
 }
 
-// TOURNOI LIVE
+// TOURNOI LIVE (AFFICHÉ EN HAUT)
 onSnapshot(doc(db,"global","tournoi"),(snap)=>{
 let t=snap.data();
 if(!t) return;
 
 document.getElementById("tournament").innerHTML=`
-<h3>${t.name}</h3>
-<p>${t.date} - ${t.time}</p>
-<p>${t.game}</p>
-<p>${t.players} joueurs max</p>`;
+<h2>🏆 ${t.name}</h2>
+<p>📅 ${t.date}</p>
+<p>⏰ ${t.time}</p>
+<p>🎮 ${t.game}</p>
+<p>👥 ${t.players} joueurs max</p>`;
 });
 
 // ADMIN
@@ -273,7 +248,7 @@ const ctx=canvas.getContext("2d");
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
 
-let stars=Array(1000).fill().map(()=>({
+let stars=Array(800).fill().map(()=>({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
 size:Math.random()*2,
