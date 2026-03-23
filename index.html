@@ -10,39 +10,27 @@
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
 body{background:black;color:white;overflow-x:hidden;}
 #galaxy{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
-
 .hero{height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-
 .glitch{font-size:50px;position:relative;}
 .glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;}
 .glitch::before{color:#ff00ff;animation:glitch1 2s infinite;}
 .glitch::after{color:#00ffff;animation:glitch2 2s infinite;}
-
 @keyframes glitch1{0%{transform:translate(2px,2px)}50%{transform:translate(-2px,-1px)}100%{transform:translate(0)}}
 @keyframes glitch2{0%{transform:translate(-2px,-2px)}50%{transform:translate(2px,1px)}100%{transform:translate(0)}}
-
 .system{text-align:center;padding:20px;}
-
 input{padding:15px;border:none;border-radius:10px;margin-top:10px;width:250px;text-align:center;}
-
 button{padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-size:14px;transition:0.3s;}
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
 .admin{background:gold;color:black;display:none;}
-
 button:hover{transform:scale(1.1);}
-
 .lists{display:flex;justify-content:center;gap:40px;margin-top:20px;flex-wrap:wrap;}
-
 .list-box{background:#111;padding:15px;border-radius:10px;min-width:200px;border:1px solid #8a2be244;}
 .list-box h3{margin-bottom:10px;color:#8a2be2;}
-
 ul{list-style:none;}
 li{margin:3px 0;}
-
 #tournamentForm{display:none;text-align:center;margin-top:10px;}
 #tournamentForm input{width:200px;}
-
 #tournamentDisplay{margin:20px auto;width:320px;}
 .tournament{background:#111;padding:15px;border-radius:10px;text-align:center;}
 </style>
@@ -116,45 +104,40 @@ const db = getFirestore(app);
 // ===== GALAXY =====
 const canvas=document.getElementById("galaxy");
 const ctx=canvas.getContext("2d");
-
-function resizeCanvas(){
-canvas.width=window.innerWidth;
-canvas.height=window.innerHeight;
-}
-window.addEventListener("resize",resizeCanvas);
-resizeCanvas();
+function resizeCanvas(){canvas.width=window.innerWidth;canvas.height=window.innerHeight;}
+window.addEventListener("resize",resizeCanvas); resizeCanvas();
 
 let stars=[];
 for(let i=0;i<300;i++){
-stars.push({
-x:Math.random()*canvas.width,
-y:Math.random()*canvas.height,
-size:1+Math.random()*2,
-speed:0.5+Math.random()*0.5
-});
+stars.push({x:Math.random()*canvas.width,y:Math.random()*canvas.height,size:1+Math.random()*2,speed:0.5+Math.random()*0.5});
 }
 
 function animate(){
 ctx.clearRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="white";
-
 stars.forEach(s=>{
 ctx.beginPath();
 ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
 ctx.fill();
-
 s.y+=s.speed;
-if(s.y>canvas.height){
-s.y=0;
-s.x=Math.random()*canvas.width;
-}
+if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}
 });
-
 requestAnimationFrame(animate);
 }
 animate();
 
-// ===== PRESENCE FIREBASE =====
+// ===== ADMIN =====
+const PASSWORD="Antoninfaure28&";
+let isAdmin=false;
+
+window.loginAdmin=function(){
+if(prompt("Mot de passe")==PASSWORD){
+isAdmin=true;
+document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
+}
+}
+
+// ===== PRESENCE =====
 window.setPresence = async function(isPresent){
 let pseudo=document.getElementById("pseudo").value.trim();
 if(!pseudo) return alert("Entre un pseudo");
@@ -165,26 +148,39 @@ present:isPresent
 });
 }
 
+// ===== SUPPRIMER JOUEUR =====
+async function deletePlayer(name){
+if(confirm("Supprimer "+name+" ?")){
+await deleteDoc(doc(db,"players",name));
+}
+}
+
+// ===== LIVE PLAYERS =====
 onSnapshot(collection(db,"players"),(snap)=>{
-let present=[],absent=[];
+presentList.innerHTML="";
+absentList.innerHTML="";
 
 snap.forEach(d=>{
 let data=d.data();
-data.present ? present.push(data.name) : absent.push(data.name);
-});
 
-presentList.innerHTML = present.map(p=>"<li>"+p+"</li>").join("");
-absentList.innerHTML = absent.map(p=>"<li>"+p+"</li>").join("");
-});
+let li=document.createElement("li");
+li.textContent=data.name;
 
-// ===== ADMIN =====
-const PASSWORD="Antoninfaure28&";
-
-window.loginAdmin=function(){
-if(prompt("Mot de passe")==PASSWORD){
-document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
+// bouton supprimer admin
+if(isAdmin){
+let btn=document.createElement("button");
+btn.textContent="❌";
+btn.style.marginLeft="10px";
+btn.style.background="red";
+btn.style.color="white";
+btn.onclick=()=>deletePlayer(data.name);
+li.appendChild(btn);
 }
-}
+
+if(data.present) presentList.appendChild(li);
+else absentList.appendChild(li);
+});
+});
 
 // ===== TOURNOI =====
 window.toggleTournamentForm=function(){
@@ -200,7 +196,6 @@ time:tourTime.value,
 game:tourGame.value,
 players:tourPlayers.value
 };
-
 await setDoc(doc(db,"global","tournoi"),t);
 toggleTournamentForm();
 }
