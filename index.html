@@ -31,13 +31,13 @@ background:rgba(0,0,0,0.6);
 backdrop-filter:blur(10px);
 }
 
-h1{color:#8a2be2;}
+h1{color:#a855f7;font-size:28px;}
 
 /* HERO */
 .hero{text-align:center;margin-top:20px;}
 
 .glitch{
-font-size:40px;
+font-size:45px;
 animation:glitch 1.5s infinite;
 }
 
@@ -48,67 +48,81 @@ animation:glitch 1.5s infinite;
 }
 
 /* SYSTEM */
-.system{text-align:center;padding:20px;}
+.system{
+display:flex;
+flex-direction:column;
+align-items:center;
+padding:20px;
+}
 
+/* INPUT */
 input{
-padding:12px;
+padding:14px;
 border:none;
-border-radius:10px;
-margin:5px;
-width:220px;
+border-radius:12px;
+margin:8px;
+width:260px;
 text-align:center;
 }
 
+/* BUTTON */
 button{
-padding:12px 20px;
+padding:14px 24px;
 margin:8px;
 border:none;
-border-radius:10px;
+border-radius:12px;
 cursor:pointer;
 transition:0.3s;
+font-size:15px;
 }
 
-button:hover{transform:scale(1.1);}
+button:hover{transform:scale(1.08);}
 
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
 .admin{background:gold;color:black;display:none;}
 
-.lists{
+/* BLOCS (FIX DEFINITIF) */
+.main-grid{
 display:flex;
-justify-content:center;
-align-items:flex-start;
-gap:30px;
-flex-wrap:wrap;
-margin-top:30px;
+flex-direction:column;
+align-items:center;
+gap:25px;
+width:100%;
+margin-top:40px;
 }
 
-.list-box{
-background:#111;
-padding:20px;
-border-radius:15px;
+.box{
 width:90%;
-max-width:350px;
+max-width:700px;
+min-height:200px;
+background:#111;
+padding:25px;
+border-radius:20px;
 border:1px solid #8a2be244;
-box-shadow:0 0 15px #8a2be233;
+box-shadow:0 0 25px #8a2be233;
+font-size:18px;
 }
 
-.list-box h3{color:#8a2be2;}
+.box h3{
+margin-bottom:15px;
+color:#a855f7;
+}
 
-ul{list-style:none;}
+ul{list-style:none;font-size:18px;}
+li{margin:6px 0;}
 
+/* TOURNOI */
 .tournament{
-background:#111;
-padding:20px;
-border-radius:15px;
-margin:30px auto;
-width:90%;
-max-width:600px;
-border:1px solid #8a2be244;
-box-shadow:0 0 20px #8a2be233;
+font-size:18px;
+text-align:center;
 }
 
-#tournamentForm{display:none;margin-top:10px;}
+/* FORM */
+#tournamentForm{
+display:none;
+margin-top:10px;
+}
 </style>
 </head>
 
@@ -124,8 +138,6 @@ box-shadow:0 0 20px #8a2be233;
 <h2 class="glitch">Xeno eSport</h2>
 <p>Gestion team & tournoi</p>
 </section>
-
-<section id="tournamentDisplay"></section>
 
 <section class="system">
 
@@ -151,26 +163,33 @@ box-shadow:0 0 20px #8a2be233;
 <button onclick="saveTournament()">Valider</button>
 </div>
 
-<div class="lists">
-<div class="list-box">
+</section>
+
+<div class="main-grid">
+
+<div class="box">
 <h3>🟢 Présents</h3>
 <ul id="presentList"></ul>
 </div>
 
-<div class="list-box">
+<div class="box">
 <h3>🔴 Absents</h3>
 <ul id="absentList"></ul>
 </div>
+
+<div class="box">
+<h3>🏆 Tournoi</h3>
+<div id="tournament" class="tournament"></div>
 </div>
 
-</section>
+</div>
 
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-// 🔥 TA CONFIG (OK)
+// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphI",
   authDomain: "xeno-esport.firebaseapp.com",
@@ -180,10 +199,10 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// ===== PRESENCE =====
+// PRESENCE
 window.setPresence = async function(isPresent){
 let pseudo = document.getElementById("pseudo").value.trim();
-if(!pseudo) return alert("Pseudo !");
+if(!pseudo) return alert("Entre un pseudo");
 
 await setDoc(doc(db,"players",pseudo),{
 name:pseudo,
@@ -191,27 +210,21 @@ present:isPresent
 });
 }
 
-// ===== LIVE PLAYERS (TEMPS RÉEL) =====
+// LIVE PLAYERS
 onSnapshot(collection(db,"players"),(snap)=>{
+let present=[], absent=[];
 
-let present=[];
-let absent=[];
-
-snap.forEach(doc=>{
-let d = doc.data();
-if(d.present){present.push(d.name);}
-else{absent.push(d.name);}
+snap.forEach(d=>{
+let data=d.data();
+if(data.present) present.push(data.name);
+else absent.push(data.name);
 });
 
-document.getElementById("presentList").innerHTML =
-present.map(p=>"<li>"+p+"</li>").join("");
-
-document.getElementById("absentList").innerHTML =
-absent.map(p=>"<li>"+p+"</li>").join("");
-
+presentList.innerHTML = present.map(p=>"<li>"+p+"</li>").join("");
+absentList.innerHTML = absent.map(p=>"<li>"+p+"</li>").join("");
 });
 
-// ===== TOURNOI (SAUVEGARDE + TEMPS RÉEL) =====
+// TOURNOI SAVE
 window.saveTournament = async function(){
 
 let t={
@@ -222,56 +235,49 @@ game:tourGame.value,
 players:tourPlayers.value
 };
 
-// IMPORTANT : on écrase pas, on stocke bien
 await setDoc(doc(db,"global","tournoi"),t);
 
-alert("Tournoi créé 🔥");
+alert("Tournoi sauvegardé ✅");
 }
 
-// LIVE tournoi
+// TOURNOI LIVE
 onSnapshot(doc(db,"global","tournoi"),(snap)=>{
-let t = snap.data();
+let t=snap.data();
 if(!t) return;
 
-document.getElementById("tournamentDisplay").innerHTML = `
-<div class="tournament">
-<h2>🏆 ${t.name}</h2>
-<p>📅 ${t.date}</p>
-<p>⏰ ${t.time}</p>
-<p>🎮 ${t.game}</p>
-<p>👥 ${t.players} joueurs</p>
-</div>
-`;
+document.getElementById("tournament").innerHTML=`
+<h3>${t.name}</h3>
+<p>${t.date} - ${t.time}</p>
+<p>${t.game}</p>
+<p>${t.players} joueurs max</p>`;
 });
 
-// ===== ADMIN =====
+// ADMIN
 const PASSWORD="Antoninfaure28&";
 
-window.loginAdmin = function(){
-let pass=prompt("Mot de passe");
-if(pass===PASSWORD){
+window.loginAdmin=function(){
+if(prompt("Mot de passe")==PASSWORD){
 document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
 }
 }
 
-// ===== FORM =====
-window.toggleForm = function(){
-let f=document.getElementById("tournamentForm");
-f.style.display=(f.style.display==="none")?"block":"none";
+// FORM
+window.toggleForm=function(){
+tournamentForm.style.display =
+tournamentForm.style.display==="none"?"block":"none";
 }
 
-// ===== GALAXIE =====
-const canvas = document.getElementById("galaxy");
-const ctx = canvas.getContext("2d");
+// GALAXIE
+const canvas=document.getElementById("galaxy");
+const ctx=canvas.getContext("2d");
+canvas.width=window.innerWidth;
+canvas.height=window.innerHeight;
 
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-
-let stars = Array(800).fill().map(()=>({
+let stars=Array(1000).fill().map(()=>({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:Math.random()*1.5,
-speed:Math.random()*0.5
+size:Math.random()*2,
+speed:Math.random()*0.6
 }));
 
 function animate(){
