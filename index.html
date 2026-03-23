@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Xeno eSport</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+
+body{
+background:radial-gradient(circle,#2b0050,#0a0014);
+color:white;
+text-align:center;
+overflow:hidden;
+}
+
+canvas{
+position:fixed;
+top:0;
+left:0;
+z-index:-1;
+}
+
+/* UI */
+input,button{
+padding:10px;
+margin:5px;
+border:none;
+border-radius:10px;
+}
+
+button{cursor:pointer;}
+
+.present{background:#00ff88;}
+.absent{background:#ff0033;color:white;}
+.admin{display:none;background:gold;color:black;}
+
+.box{
+background:#111;
+padding:15px;
+margin:10px auto;
+border-radius:10px;
+width:300px;
+}
+
+</style>
+</head>
+
+<body>
+
+<canvas id="galaxy"></canvas>
+
+<h1>🔥 Xeno eSport</h1>
+
+<input id="pseudo" placeholder="Pseudo"><br>
+
+<button class="present" onclick="setPresence(true)">Présent</button>
+<button class="absent" onclick="setPresence(false)">Absent</button>
+
+<br>
+
+<button onclick="loginAdmin()">Admin</button>
+
+<div class="admin">
+<input id="tourName" placeholder="Nom tournoi"><br>
+<input id="tourDate" type="date"><br>
+<input id="tourTime" type="time"><br>
+<input id="tourGame" placeholder="Jeu"><br>
+<input id="tourPlayers" placeholder="Joueurs max"><br>
+<button onclick="saveTournament()">Créer tournoi</button>
+</div>
+
+<div class="box">
+<h2>🟢 Présents</h2>
+<ul id="presentList"></ul>
+</div>
+
+<div class="box">
+<h2>🔴 Absents</h2>
+<ul id="absentList"></ul>
+</div>
+
+<div class="box">
+<h2>🏆 Tournoi</h2>
+<div id="tournament"></div>
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphI",
+  authDomain: "xeno-esport.firebaseapp.com",
+  projectId: "xeno-esport",
+  storageBucket: "xeno-esport.appspot.com",
+  messagingSenderId: "870029280667",
+  appId: "1:870029280667:web:50a4af541bb"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// ===== PRESENCE =====
+window.setPresence = async function(isPresent){
+let pseudo = document.getElementById("pseudo").value.trim();
+if(!pseudo) return alert("Pseudo !");
+
+await setDoc(doc(db,"players",pseudo),{
+name:pseudo,
+present:isPresent
+});
+}
+
+// ===== LIVE UPDATE =====
+onSnapshot(doc(db,"global","data"),(snap)=>{
+let data = snap.data() || {};
+
+let present = data.present || [];
+let absent = data.absent || [];
+let tournament = data.tournament || null;
+
+// affichage
+document.getElementById("presentList").innerHTML =
+present.map(p=>"<li>"+p+"</li>").join("");
+
+document.getElementById("absentList").innerHTML =
+absent.map(p=>"<li>"+p+"</li>").join("");
+
+if(tournament){
+document.getElementById("tournament").innerHTML = `
+<h3>${tournament.name}</h3>
+<p>${tournament.date} ${tournament.time}</p>
+<p>${tournament.game}</p>
+<p>${tournament.players} joueurs</p>
+`;
+}
+
+});
+
+// ===== ADMIN =====
+const PASSWORD="Antoninfaure28&";
+
+window.loginAdmin = function(){
+let pass = prompt("Mot de passe");
+if(pass===PASSWORD){
+document.querySelectorAll(".admin").forEach(b=>b.style.display="block");
+}
+}
+
+// ===== TOURNOI =====
+window.saveTournament = async function(){
+
+let tournament = {
+name:tourName.value,
+date:tourDate.value,
+time:tourTime.value,
+game:tourGame.value,
+players:tourPlayers.value
+};
+
+await setDoc(doc(db,"global","data"),{
+tournament
+});
+
+}
+
+// ===== GALAXIE =====
+const canvas = document.getElementById("galaxy");
+const ctx = canvas.getContext("2d");
+
+canvas.width = window.innerWidth;
+canvas.height = window.innerHeight;
+
+let stars = Array(500).fill().map(()=>({
+x:Math.random()*canvas.width,
+y:Math.random()*canvas.height,
+size:Math.random()*2,
+speed:Math.random()*0.5
+}));
+
+function animate(){
+ctx.fillStyle="rgba(10,0,20,0.6)";
+ctx.fillRect(0,0,canvas.width,canvas.height);
+
+ctx.fillStyle="white";
+
+stars.forEach(s=>{
+ctx.beginPath();
+ctx.arc(s.x,s.y,s.size,0,Math.PI*2);
+ctx.fill();
+
+s.y+=s.speed;
+if(s.y>canvas.height){s.y=0;s.x=Math.random()*canvas.width;}
+});
+
+requestAnimationFrame(animate);
+}
+
+animate();
+
+</script>
+
+</body>
+</html>
