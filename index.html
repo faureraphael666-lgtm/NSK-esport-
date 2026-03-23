@@ -134,6 +134,7 @@ window.loginAdmin=function(){
 if(prompt("Mot de passe")==PASSWORD){
 isAdmin=true;
 document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
+refreshPlayers(); // 🔥 FIX IMPORTANT
 }
 }
 
@@ -148,25 +149,25 @@ present:isPresent
 });
 }
 
-// ===== SUPPRIMER JOUEUR =====
+// ===== DELETE PLAYER =====
 async function deletePlayer(name){
 if(confirm("Supprimer "+name+" ?")){
 await deleteDoc(doc(db,"players",name));
 }
 }
 
-// ===== LIVE PLAYERS =====
-onSnapshot(collection(db,"players"),(snap)=>{
+// ===== STOCKAGE LOCAL TEMP =====
+let currentPlayers=[];
+
+// ===== REFRESH LIST =====
+function refreshPlayers(){
 presentList.innerHTML="";
 absentList.innerHTML="";
 
-snap.forEach(d=>{
-let data=d.data();
-
+currentPlayers.forEach(data=>{
 let li=document.createElement("li");
 li.textContent=data.name;
 
-// bouton supprimer admin
 if(isAdmin){
 let btn=document.createElement("button");
 btn.textContent="❌";
@@ -180,6 +181,13 @@ li.appendChild(btn);
 if(data.present) presentList.appendChild(li);
 else absentList.appendChild(li);
 });
+}
+
+// ===== LIVE PLAYERS =====
+onSnapshot(collection(db,"players"),(snap)=>{
+currentPlayers=[];
+snap.forEach(d=>currentPlayers.push(d.data()));
+refreshPlayers();
 });
 
 // ===== TOURNOI =====
@@ -210,7 +218,7 @@ await deleteDoc(doc(db,"global","tournoi"));
 }
 }
 
-// LIVE TOURNOI
+// ===== LIVE TOURNOI =====
 onSnapshot(doc(db,"global","tournoi"),(snap)=>{
 let t=snap.data();
 const display=document.getElementById("tournamentDisplay");
