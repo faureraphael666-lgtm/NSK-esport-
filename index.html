@@ -2,116 +2,49 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Xeno eSport</title>
-
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Xeno eSport - Présence/Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
+body{background:black;color:white;overflow-x:hidden;}
+#galaxy{position:fixed;top:0;left:0;width:100%;height:100%;z-index:-1;}
 
-body{
-background:radial-gradient(circle,#2b0050,#0a0014);
-color:white;
-}
+.hero{height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
 
-/* GALAXIE */
-canvas{
-position:fixed;
-top:0;
-left:0;
-z-index:-1;
-}
+.glitch{font-size:50px;position:relative;}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;}
+.glitch::before{color:#ff00ff;animation:glitch1 2s infinite;}
+.glitch::after{color:#00ffff;animation:glitch2 2s infinite;}
 
-/* HEADER */
-header{
-text-align:center;
-padding:20px;
-background:rgba(0,0,0,0.6);
-}
+@keyframes glitch1{0%{transform:translate(2px,2px)}50%{transform:translate(-2px,-1px)}100%{transform:translate(0)}}
+@keyframes glitch2{0%{transform:translate(-2px,-2px)}50%{transform:translate(2px,1px)}100%{transform:translate(0)}}
 
-h1{color:#a855f7;font-size:30px;}
+.system{text-align:center;padding:20px;}
 
-/* SYSTEM */
-.system{
-display:flex;
-flex-direction:column;
-align-items:center;
-padding:20px;
-}
+input{padding:15px;border:none;border-radius:10px;margin-top:10px;width:250px;text-align:center;}
 
-/* PSEUDO */
-#pseudo{
-padding:18px;
-font-size:20px;
-width:90%;
-max-width:400px;
-border-radius:15px;
-text-align:center;
-margin-bottom:15px;
-}
-
-/* TOURNOI (JUSTE SOUS PSEUDO) */
-.tournament-box{
-width:90%;
-max-width:700px;
-background:#111;
-padding:25px;
-border-radius:20px;
-border:1px solid #8a2be244;
-box-shadow:0 0 25px #8a2be233;
-text-align:center;
-margin-bottom:20px;
-}
-
-/* BOUTONS */
-button{
-padding:16px 30px;
-font-size:18px;
-margin:10px;
-border:none;
-border-radius:15px;
-cursor:pointer;
-transition:0.3s;
-}
-
-button:hover{transform:scale(1.1);}
-
+button{padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-size:14px;transition:0.3s;}
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
 .admin{background:gold;color:black;display:none;}
 
-/* GRID */
-.main-grid{
-display:flex;
-flex-direction:column;
-align-items:center;
-gap:25px;
-width:100%;
-margin-top:20px;
-}
+button:hover{transform:scale(1.1);}
 
-.box{
-width:90%;
-max-width:700px;
-min-height:200px;
-background:#111;
-padding:25px;
-border-radius:20px;
-border:1px solid #8a2be244;
-box-shadow:0 0 25px #8a2be233;
-font-size:18px;
-}
+.lists{display:flex;justify-content:center;gap:40px;margin-top:20px;flex-wrap:wrap;}
 
-.box h3{color:#a855f7;margin-bottom:10px;}
+.list-box{background:#111;padding:15px;border-radius:10px;min-width:200px;border:1px solid #8a2be244;}
+.list-box h3{margin-bottom:10px;color:#8a2be2;}
 
 ul{list-style:none;}
-li{margin:6px 0;}
+li{margin:3px 0;}
 
-/* FORM */
-#tournamentForm{
-display:none;
-margin-top:10px;
-}
+#tournamentForm{display:none;text-align:center;margin-top:10px;}
+#tournamentForm input{width:200px;}
+
+#tournamentDisplay{margin:20px auto;width:320px;}
+.tournament{background:#111;padding:15px;border-radius:10px;text-align:center;}
 </style>
 </head>
 
@@ -119,146 +52,90 @@ margin-top:10px;
 
 <canvas id="galaxy"></canvas>
 
-<header>
-<h1>Xeno eSport</h1>
-</header>
+<section id="tournamentDisplay"></section>
+
+<section class="hero">
+<h1 class="glitch" data-text="Xeno eSport">Xeno eSport</h1>
+<p>Système de présence team</p>
+</section>
 
 <section class="system">
 
-<input id="pseudo" placeholder="Entre ton pseudo">
+<input type="text" id="pseudo" placeholder="Entre ton pseudo">
 
-<!-- TOURNOI ICI -->
-<div id="tournament" class="tournament-box"></div>
-
-<div>
+<div class="buttons">
 <button class="present" onclick="setPresence(true)">Présent</button>
 <button class="absent" onclick="setPresence(false)">Absent</button>
 </div>
 
 <button onclick="loginAdmin()">Connexion Admin</button>
 
-<div>
-<button class="admin" onclick="toggleForm()">Créer tournoi</button>
+<div class="admin-buttons">
+<button id="createBtn" class="admin" onclick="toggleTournamentForm()">Créer tournoi</button>
+<button id="editBtn" class="admin" onclick="editTournament()">Modifier tournoi</button>
+<button id="deleteBtn" class="admin" onclick="deleteTournament()">Supprimer tournoi</button>
 </div>
 
 <div id="tournamentForm">
-<input id="tourName" placeholder="Nom"><br>
-<input id="tourDate" type="date"><br>
-<input id="tourTime" type="time"><br>
-<input id="tourGame" placeholder="Jeu"><br>
-<input id="tourPlayers" placeholder="Joueurs max"><br>
+<h3>Tournoi</h3>
+<input type="text" id="tourName" placeholder="Nom"><br>
+<input type="date" id="tourDate"><br>
+<input type="time" id="tourTime"><br>
+<input type="text" id="tourGame" placeholder="Jeu"><br>
+<input type="number" id="tourPlayers" placeholder="Joueurs max"><br>
 <button onclick="saveTournament()">Valider</button>
+</div>
+
+<div class="lists">
+<div class="list-box">
+<h3>🟢 Présents</h3>
+<ul id="presentList"></ul>
+</div>
+<div class="list-box">
+<h3>🔴 Absents</h3>
+<ul id="absentList"></ul>
+</div>
 </div>
 
 </section>
 
-<div class="main-grid">
-
-<div class="box">
-<h3>🟢 Présents</h3>
-<ul id="presentList"></ul>
-</div>
-
-<div class="box">
-<h3>🔴 Absents</h3>
-<ul id="absentList"></ul>
-</div>
-
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getFirestore, collection, onSnapshot, doc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+import { getFirestore, collection, onSnapshot, doc, setDoc, deleteDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphI",
-  authDomain: "xeno-esport.firebaseapp.com",
-  projectId: "xeno-esport"
+apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphI",
+authDomain: "xeno-esport.firebaseapp.com",
+projectId: "xeno-esport"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// PRESENCE
-window.setPresence = async function(isPresent){
-let pseudo = document.getElementById("pseudo").value.trim();
-if(!pseudo) return alert("Entre un pseudo");
-
-await setDoc(doc(db,"players",pseudo),{
-name:pseudo,
-present:isPresent
-});
-}
-
-// LIVE PLAYERS
-onSnapshot(collection(db,"players"),(snap)=>{
-let present=[], absent=[];
-snap.forEach(d=>{
-let data=d.data();
-data.present ? present.push(data.name) : absent.push(data.name);
-});
-presentList.innerHTML = present.map(p=>"<li>"+p+"</li>").join("");
-absentList.innerHTML = absent.map(p=>"<li>"+p+"</li>").join("");
-});
-
-// TOURNOI SAVE
-window.saveTournament = async function(){
-let t={
-name:tourName.value,
-date:tourDate.value,
-time:tourTime.value,
-game:tourGame.value,
-players:tourPlayers.value
-};
-await setDoc(doc(db,"global","tournoi"),t);
-}
-
-// TOURNOI LIVE (AFFICHÉ EN HAUT)
-onSnapshot(doc(db,"global","tournoi"),(snap)=>{
-let t=snap.data();
-if(!t) return;
-
-document.getElementById("tournament").innerHTML=`
-<h2>🏆 ${t.name}</h2>
-<p>📅 ${t.date}</p>
-<p>⏰ ${t.time}</p>
-<p>🎮 ${t.game}</p>
-<p>👥 ${t.players} joueurs max</p>`;
-});
-
-// ADMIN
-const PASSWORD="Antoninfaure28&";
-
-window.loginAdmin=function(){
-if(prompt("Mot de passe")==PASSWORD){
-document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
-}
-}
-
-// FORM
-window.toggleForm=function(){
-tournamentForm.style.display =
-tournamentForm.style.display==="none"?"block":"none";
-}
-
-// GALAXIE
+// ===== GALAXY =====
 const canvas=document.getElementById("galaxy");
 const ctx=canvas.getContext("2d");
+
+function resizeCanvas(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
+}
+window.addEventListener("resize",resizeCanvas);
+resizeCanvas();
 
-let stars=Array(800).fill().map(()=>({
+let stars=[];
+for(let i=0;i<300;i++){
+stars.push({
 x:Math.random()*canvas.width,
 y:Math.random()*canvas.height,
-size:Math.random()*2,
-speed:Math.random()*0.6
-}));
+size:1+Math.random()*2,
+speed:0.5+Math.random()*0.5
+});
+}
 
 function animate(){
-ctx.fillStyle="rgba(10,0,20,0.6)";
-ctx.fillRect(0,0,canvas.width,canvas.height);
-
+ctx.clearRect(0,0,canvas.width,canvas.height);
 ctx.fillStyle="white";
 
 stars.forEach(s=>{
@@ -275,8 +152,87 @@ s.x=Math.random()*canvas.width;
 
 requestAnimationFrame(animate);
 }
-
 animate();
+
+// ===== PRESENCE FIREBASE =====
+window.setPresence = async function(isPresent){
+let pseudo=document.getElementById("pseudo").value.trim();
+if(!pseudo) return alert("Entre un pseudo");
+
+await setDoc(doc(db,"players",pseudo),{
+name:pseudo,
+present:isPresent
+});
+}
+
+onSnapshot(collection(db,"players"),(snap)=>{
+let present=[],absent=[];
+
+snap.forEach(d=>{
+let data=d.data();
+data.present ? present.push(data.name) : absent.push(data.name);
+});
+
+presentList.innerHTML = present.map(p=>"<li>"+p+"</li>").join("");
+absentList.innerHTML = absent.map(p=>"<li>"+p+"</li>").join("");
+});
+
+// ===== ADMIN =====
+const PASSWORD="Antoninfaure28&";
+
+window.loginAdmin=function(){
+if(prompt("Mot de passe")==PASSWORD){
+document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
+}
+}
+
+// ===== TOURNOI =====
+window.toggleTournamentForm=function(){
+let f=document.getElementById("tournamentForm");
+f.style.display = (f.style.display==="none")?"block":"none";
+}
+
+window.saveTournament = async function(){
+let t={
+name:tourName.value,
+date:tourDate.value,
+time:tourTime.value,
+game:tourGame.value,
+players:tourPlayers.value
+};
+
+await setDoc(doc(db,"global","tournoi"),t);
+toggleTournamentForm();
+}
+
+window.editTournament=function(){
+document.getElementById("tournamentForm").style.display="block";
+}
+
+window.deleteTournament=async function(){
+if(confirm("Supprimer tournoi ?")){
+await deleteDoc(doc(db,"global","tournoi"));
+}
+}
+
+// LIVE TOURNOI
+onSnapshot(doc(db,"global","tournoi"),(snap)=>{
+let t=snap.data();
+const display=document.getElementById("tournamentDisplay");
+
+if(!t){
+display.innerHTML="";
+return;
+}
+
+display.innerHTML=`
+<div class="tournament">
+<h3>🏆 ${t.name}</h3>
+<p>${t.date} - ${t.time}</p>
+<p>${t.game}</p>
+<p>${t.players} joueurs max</p>
+</div>`;
+});
 
 </script>
 
