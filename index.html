@@ -11,7 +11,12 @@ body{background:#000;color:white;overflow-x:hidden;}
 body::before{content:"";position:fixed;width:200%;height:200%;top:-50%;left:-50%;background:radial-gradient(circle at 30% 30%, rgba(0,255,120,0.15), transparent 40%),radial-gradient(circle at 70% 60%, rgba(0,255,100,0.12), transparent 40%),radial-gradient(circle at 50% 80%, rgba(0,255,80,0.1), transparent 40%);animation:liquid 12s infinite linear;z-index:-1;filter:blur(60px);}
 @keyframes liquid{0%{transform:rotate(0deg) scale(1);}50%{transform:rotate(180deg) scale(1.2);}100%{transform:rotate(360deg) scale(1);}}
 .hero{height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-.glitch{font-size:50px;color:#00ff88;text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;}
+.glitch{
+  font-size:40px; /* réduit pour aligner les symboles */
+  color:#00ff88;
+  text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+  white-space: nowrap;
+}
 .system{text-align:center;padding:20px;}
 input{padding:12px;border:none;border-radius:10px;margin:8px;width:220px;text-align:center;}
 button{padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-size:14px;transition:0.3s;}
@@ -81,10 +86,9 @@ button:hover{transform:scale(1.1);}
 </div>
 </div>
 
-<!-- Firebase -->
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, update, remove, get } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // === FIREBASE CONFIG ===
 const firebaseConfig = {
@@ -131,7 +135,7 @@ function setPresence(isPresent){
   const removeList = isPresent ? 'absent' : 'present';
   const updates = {};
   updates[addList + "/" + key] = {name: pseudo};
-  updates[removeList + "/" + key] = null; // supprime de l'autre liste
+  updates[removeList + "/" + key] = null;
   update(ref(db), updates);
   document.getElementById("pseudo").value="";
 }
@@ -178,6 +182,18 @@ function sendDiscord(title,desc){
 onValue(ref(db,'present'), snapshot => { present = snapshot.val()||{}; render(); });
 onValue(ref(db,'absent'), snapshot => { absent = snapshot.val()||{}; render(); });
 onValue(ref(db,'tournament'), snapshot => { tournament = snapshot.val()||null; render(); });
+
+// === EXPOSE FUNCTIONS GLOBALEMENT POUR BOUTONS HTML ===
+window.setPresence = setPresence;
+window.loginAdmin = loginAdmin;
+window.logout = logout;
+window.openPopup = openPopup;
+window.closePopup = closePopup;
+window.createTournament = createTournament;
+window.editTournament = editTournament;
+window.deleteTournament = deleteTournament;
+window.removePlayer = removePlayer;
+window.resetPresence = resetPresence;
 
 </script>
 </body>
