@@ -54,6 +54,7 @@ button:hover{transform:scale(1.1);}
 <button class="admin" onclick="editTournament()">Modifier tournoi</button>
 <button class="admin" onclick="deleteTournament()">Supprimer tournoi</button>
 <button class="admin" onclick="removePlayer()">Supprimer joueur</button>
+<button class="admin" onclick="resetPresence()">Réinitialiser toutes les présences/absences</button>
 </div>
 
 <div id="tournamentDisplay"></div>
@@ -180,13 +181,18 @@ function setPresence(isPresent){
   let addList = isPresent ? 'present' : 'absent';
   let removeList = isPresent ? 'absent' : 'present';
 
-  // Supprimer de l'autre liste
   db.ref(removeList + "/" + key).remove();
-
-  // Ajouter / mettre à jour dans la liste correcte
-  db.ref(addList + "/" + key).set({name: pseudo});
+  db.ref(addList + "/" + key).set({name:pseudo});
 
   document.getElementById("pseudo").value="";
+}
+
+// ===== RESET ADMIN =====
+function resetPresence(){
+  if(confirm("Réinitialiser toutes les présences et absences ?")){
+    db.ref('present').remove();
+    db.ref('absent').remove();
+  }
 }
 
 // ===== TOURNOI =====
