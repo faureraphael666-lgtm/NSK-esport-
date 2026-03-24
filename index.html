@@ -172,14 +172,20 @@ function setPresence(isPresent){
 let pseudo = document.getElementById("pseudo").value.trim();
 if(!pseudo){alert("Entre ton pseudo !"); return;}
 
-// 🔹 Utilisation de push() pour éviter les problèmes de caractères spéciaux
-if(isPresent){
-db.ref('present').push({name:pseudo});
-db.ref('absent').orderByChild('name').equalTo(pseudo).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
-}else{
-db.ref('absent').push({name:pseudo});
-db.ref('present').orderByChild('name').equalTo(pseudo).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
-}
+const listToAdd = isPresent ? 'present' : 'absent';
+const listToRemove = isPresent ? 'absent' : 'present';
+
+// Supprimer le pseudo de l'autre liste s'il existe
+db.ref(listToRemove).orderByChild('name').equalTo(pseudo).once('value', snapshot=>{
+  snapshot.forEach(s=>s.ref.remove());
+});
+
+// Ajouter le pseudo si pas déjà présent
+db.ref(listToAdd).orderByChild('name').equalTo(pseudo).once('value', snapshot=>{
+  if(!snapshot.exists()){
+    db.ref(listToAdd).push({name:pseudo});
+  }
+});
 
 document.getElementById("pseudo").value="";
 }
