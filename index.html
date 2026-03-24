@@ -148,7 +148,6 @@ box-shadow:0 0 20px #00ff88;
 <button class="login-btn" onclick="openPopup()">Connexion Admin</button>
 <button class="logout" onclick="logout()">Se déconnecter</button>
 
-<!-- ADMIN -->
 <div>
 <button class="admin" onclick="createTournament()">Créer tournoi</button>
 <button class="admin" onclick="editTournament()">Modifier tournoi</button>
@@ -156,7 +155,6 @@ box-shadow:0 0 20px #00ff88;
 <button class="admin" onclick="removePlayer()">Supprimer joueur</button>
 </div>
 
-<!-- TOURNOI -->
 <div id="tournamentDisplay"></div>
 
 <div class="lists">
@@ -172,7 +170,6 @@ box-shadow:0 0 20px #00ff88;
 
 </section>
 
-<!-- POPUP LOGIN -->
 <div id="popup">
 <div class="popup-box">
 <h3>Connexion Admin</h3>
@@ -185,7 +182,6 @@ box-shadow:0 0 20px #00ff88;
 
 <script>
 
-// ===== CONFIG =====
 const ADMINS = [
 { id:"j.carton", pass:"M0t de p@&se" },
 { id:"ohgabriil2a", pass:"As0racle2a1" }
@@ -194,13 +190,11 @@ const ADMINS = [
 const WEBHOOK = "https://discord.com/api/webhooks/1485938598912987217/TEaxEsSxThv8dGPZDM23QNs8jWUWC_lsIF7TipbhJqvjNz1tJTlO-3buZQw_YKlI_p2_";
 const SITE = "https://toxic-esport-app.netlify.app/";
 
-// ===== DATA =====
 let present = JSON.parse(localStorage.getItem("present"))||[];
 let absent = JSON.parse(localStorage.getItem("absent"))||[];
 let tournament = JSON.parse(localStorage.getItem("tournament"))||null;
 let isAdmin = localStorage.getItem("admin") === "true";
 
-// ===== DISCORD =====
 function sendDiscord(title, desc){
 fetch(WEBHOOK,{
 method:"POST",
@@ -208,14 +202,21 @@ headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
 embeds:[{
 title:title,
-description:desc + "\n\n🔗 Accéder au site : " + SITE,
+description:desc + `
+
+📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent
+
+ℹ️ Instructions :
+Pour indiquer votre présence ou votre absence, cliquez sur le lien du site,
+entrez votre pseudo puis appuyez sur "Présent" ou "Absent".
+
+🔗 Accéder au site : ` + SITE,
 color:65280
 }]
 })
 });
 }
 
-// ===== ADMIN =====
 function updateAdminUI(){
 document.querySelectorAll(".admin").forEach(btn=>{
 btn.style.display = isAdmin ? "inline-block" : "none";
@@ -248,7 +249,6 @@ alert("Déconnecté");
 function openPopup(){popup.style.display="flex";}
 function closePopup(){popup.style.display="none";}
 
-// ===== PRESENCE =====
 function setPresence(isPresent){
 let pseudo=document.getElementById("pseudo").value.trim();
 if(!pseudo){alert("Entre ton pseudo !");return;}
@@ -264,7 +264,6 @@ render();
 document.getElementById("pseudo").value="";
 }
 
-// ===== TOURNOI =====
 function createTournament(){
 let name=prompt("Nom du tournoi ?");
 let date=prompt("Date ?");
@@ -322,7 +321,6 @@ render();
 }
 }
 
-// ===== SUPPRIMER JOUEUR =====
 function removePlayer(){
 let name=prompt("Pseudo à supprimer ?");
 if(!name) return;
@@ -334,7 +332,6 @@ save();
 render();
 }
 
-// ===== RENDER =====
 function render(){
 presentList.innerHTML = present.map(p=>`<li>${p}</li>`).join("");
 absentList.innerHTML = absent.map(p=>`<li>${p}</li>`).join("");
@@ -351,7 +348,6 @@ localStorage.setItem("absent",JSON.stringify(absent));
 localStorage.setItem("tournament",JSON.stringify(tournament));
 }
 
-// INIT
 updateAdminUI();
 render();
 
