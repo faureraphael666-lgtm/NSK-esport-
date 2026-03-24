@@ -136,9 +136,11 @@ function setPresence(isPresent){
   let key = sanitizePseudo(pseudo);
   let addList = isPresent ? 'present' : 'absent';
   let removeList = isPresent ? 'absent' : 'present';
-  db.ref(removeList + "/" + key).remove();
-  db.ref(addList + "/" + key).set({name:pseudo});
-  document.getElementById("pseudo").value="";
+  // Supprimer de l'autre liste avant d'ajouter
+  db.ref(removeList + "/" + key).remove().then(()=>{
+    db.ref(addList + "/" + key).set({name: pseudo});
+    document.getElementById("pseudo").value = "";
+  });
 }
 
 // ADMIN FUNCTIONS
