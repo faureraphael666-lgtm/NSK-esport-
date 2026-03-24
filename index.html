@@ -172,15 +172,16 @@ function setPresence(isPresent){
 let pseudo = document.getElementById("pseudo").value.trim();
 if(!pseudo){alert("Entre ton pseudo !"); return;}
 
+// 🔹 Utilisation de push() pour éviter les problèmes de caractères spéciaux
 if(isPresent){
-db.ref('present/'+pseudo).set(true);
-db.ref('absent/'+pseudo).remove();
+db.ref('present').push({name:pseudo});
+db.ref('absent').orderByChild('name').equalTo(pseudo).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
 }else{
-db.ref('absent/'+pseudo).set(true);
-db.ref('present/'+pseudo).remove();
+db.ref('absent').push({name:pseudo});
+db.ref('present').orderByChild('name').equalTo(pseudo).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
 }
 
-document.getElementById("pseudo").value=""; // 🔹 Ne pas appeler render() ici, Firebase fera le rendu
+document.getElementById("pseudo").value="";
 }
 
 // ===== TOURNOI =====
@@ -225,8 +226,8 @@ sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
 function removePlayer(){
 let name=prompt("Pseudo à supprimer ?");
 if(!name) return;
-db.ref('present/'+name).remove();
-db.ref('absent/'+name).remove();
+db.ref('present').orderByChild('name').equalTo(name).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
+db.ref('absent').orderByChild('name').equalTo(name).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
 }
 
 // ===== RENDER =====
@@ -237,10 +238,10 @@ const presentTitle = document.getElementById("presentTitle");
 const absentTitle = document.getElementById("absentTitle");
 const tournamentDisplay = document.getElementById("tournamentDisplay");
 
-presentList.innerHTML = Object.keys(present||{}).map(p=>`<li>${p}</li>`).join("");
-absentList.innerHTML = Object.keys(absent||{}).map(p=>`<li>${p}</li>`).join("");
-presentTitle.textContent = `🟢 Présents (${Object.keys(present||{}).length})`;
-absentTitle.textContent = `🔴 Absents (${Object.keys(absent||{}).length})`;
+presentList.innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
+absentList.innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
+presentTitle.textContent = `🟢 Présents (${Object.values(present||{}).length})`;
+absentTitle.textContent = `🔴 Absents (${Object.values(absent||{}).length})`;
 
 tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
