@@ -80,7 +80,7 @@ button:hover{transform:scale(1.1);}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getDatabase, ref, set, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+import { getDatabase, ref, set, onValue, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
 // === FIREBASE CONFIG ===
 const firebaseConfig = {
@@ -109,6 +109,7 @@ let isAdmin = localStorage.getItem("admin")==="true";
 
 function sanitizePseudo(pseudo){ return pseudo.replace(/[.#$[\]]/g,"_"); }
 
+// === RENDER LISTES ===
 function render(){
   document.getElementById("presentList").innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
   document.getElementById("absentList").innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
@@ -122,12 +123,10 @@ function setPresence(isPresent){
   const pseudo = document.getElementById("pseudo").value.trim();
   if(!pseudo){ alert("Entre ton pseudo !"); return; }
   const key = sanitizePseudo(pseudo);
-  const addList = isPresent ? 'present' : 'absent';
-  const removeList = isPresent ? 'absent' : 'present';
-  const updates = {};
-  updates[addList + "/" + key] = {name: pseudo};
-  updates[removeList + "/" + key] = null;
-  update(ref(db), updates);
+  const targetNode = isPresent ? 'present' : 'absent';
+  const otherNode = isPresent ? 'absent' : 'present';
+  set(ref(db, `${targetNode}/${key}`), {name: pseudo});
+  remove(ref(db, `${otherNode}/${key}`));
   document.getElementById("pseudo").value="";
 }
 
@@ -159,7 +158,14 @@ function editTournament(){
 }
 function deleteTournament(){ if(!tournament){alert("Aucun tournoi");return;} if(confirm("Supprimer tournoi ?")){ tournament=null; remove(ref(db,'tournament')); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé."); } }
 function removePlayer(){ const name=prompt("Pseudo à supprimer ?"); if(!name) return; const key=sanitizePseudo(name); remove(ref(db,'present/'+key)); remove(ref(db,'absent/'+key)); }
-function resetPresence(){ if(confirm("Réinitialiser toutes les présences/absences ?")){ remove(ref(db,'present')); remove(ref(db,'absent')); } }
+
+// === RÉINITIALISER LES LISTES SANS BUG ===
+function resetPresence(){
+  if(confirm("Réinitialiser toutes les présences/absences ?")){
+    remove(ref(db,'present')).then(()=>set(ref(db,'present'),{}));
+    remove(ref(db,'absent')).then(()=>set(ref(db,'absent'),{}));
+  }
+}
 
 // === DISCORD ===
 function sendDiscord(title,desc){
@@ -170,11 +176,15 @@ function sendDiscord(title,desc){
 }
 
 // === FIREBASE SYNC ===
-onValue(ref(db,'present'), snapshot => { present = snapshot.val() || {}; render(); });
-onValue(ref(db,'absent'), snapshot => { absent = snapshot.val() || {}; render(); });
-onValue(ref(db,'tournament'), snapshot => { tournament = snapshot.val() || null; render(); });
+const dbRefPresent = ref(db,'present');
+const dbRefAbsent = ref(db,'absent');
+const dbRefTournament = ref(db,'tournament');
 
-// === EXPOSE FUNCTIONS GLOBALEMENT POUR BOUTONS HTML ===
+onValue(dbRefPresent, snapshot => { present = snapshot.val() || {}; render(); });
+onValue(dbRefAbsent, snapshot => { absent = snapshot.val() || {}; render(); });
+onValue(dbRefTournament, snapshot => { tournament = snapshot.val() || null; render(); });
+
+// === EXPOSE FUNCTIONS GLOBALEMENT ===
 window.setPresence = setPresence;
 window.loginAdmin = loginAdmin;
 window.logout = logout;
