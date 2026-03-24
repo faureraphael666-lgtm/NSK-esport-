@@ -168,26 +168,25 @@ function openPopup(){popup.style.display="flex";}
 function closePopup(){popup.style.display="none";}
 
 // ===== PRESENCE =====
+function sanitizePseudo(pseudo){
+  return pseudo.replace(/[.#$[\]]/g,"_");
+}
+
 function setPresence(isPresent){
-let pseudo = document.getElementById("pseudo").value.trim();
-if(!pseudo){alert("Entre ton pseudo !"); return;}
+  let pseudo = document.getElementById("pseudo").value.trim();
+  if(!pseudo){ alert("Entre ton pseudo !"); return; }
 
-const listToAdd = isPresent ? 'present' : 'absent';
-const listToRemove = isPresent ? 'absent' : 'present';
+  let key = sanitizePseudo(pseudo);
+  let addList = isPresent ? 'present' : 'absent';
+  let removeList = isPresent ? 'absent' : 'present';
 
-// Supprimer le pseudo de l'autre liste s'il existe
-db.ref(listToRemove).orderByChild('name').equalTo(pseudo).once('value', snapshot=>{
-  snapshot.forEach(s=>s.ref.remove());
-});
+  // Supprimer de l'autre liste
+  db.ref(removeList + "/" + key).remove();
 
-// Ajouter le pseudo si pas déjà présent
-db.ref(listToAdd).orderByChild('name').equalTo(pseudo).once('value', snapshot=>{
-  if(!snapshot.exists()){
-    db.ref(listToAdd).push({name:pseudo});
-  }
-});
+  // Ajouter / mettre à jour dans la liste correcte
+  db.ref(addList + "/" + key).set({name: pseudo});
 
-document.getElementById("pseudo").value="";
+  document.getElementById("pseudo").value="";
 }
 
 // ===== TOURNOI =====
@@ -232,8 +231,9 @@ sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
 function removePlayer(){
 let name=prompt("Pseudo à supprimer ?");
 if(!name) return;
-db.ref('present').orderByChild('name').equalTo(name).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
-db.ref('absent').orderByChild('name').equalTo(name).once('value', snap=>{ snap.forEach(s=>s.ref.remove()); });
+let key = sanitizePseudo(name);
+db.ref('present/' + key).remove();
+db.ref('absent/' + key).remove();
 }
 
 // ===== RENDER =====
@@ -246,8 +246,8 @@ const tournamentDisplay = document.getElementById("tournamentDisplay");
 
 presentList.innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
 absentList.innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
-presentTitle.textContent = `🟢 Présents (${Object.values(present||{}).length})`;
-absentTitle.textContent = `🔴 Absents (${Object.values(absent||{}).length})`;
+presentTitle.textContent = `🟢 Présents (${Object.keys(present||{}).length})`;
+absentTitle.textContent = `🔴 Absents (${Object.keys(absent||{}).length})`;
 
 tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
