@@ -8,127 +8,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
 
 <style>
-
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
-
-body{
-background:#000;
-color:white;
-overflow-x:hidden;
-}
-
-/* BACKGROUND */
-body::before{
-content:"";
-position:fixed;
-width:200%;
-height:200%;
-top:-50%;
-left:-50%;
-background:
-radial-gradient(circle at 30% 30%, rgba(0,255,120,0.15), transparent 40%),
-radial-gradient(circle at 70% 60%, rgba(0,255,100,0.12), transparent 40%),
-radial-gradient(circle at 50% 80%, rgba(0,255,80,0.1), transparent 40%);
-animation:liquid 12s infinite linear;
-z-index:-1;
-filter:blur(60px);
-}
-
-@keyframes liquid{
-0%{transform:rotate(0deg) scale(1);}
-50%{transform:rotate(180deg) scale(1.2);}
-100%{transform:rotate(360deg) scale(1);}
-}
-
-/* HERO */
-.hero{
-height:40vh;
-display:flex;
-align-items:center;
-justify-content:center;
-flex-direction:column;
-}
-
-.glitch{
-font-size:50px;
-color:#00ff88;
-text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
-}
-
-/* SYSTEM */
+body{background:#000;color:white;overflow-x:hidden;}
+body::before{content:"";position:fixed;width:200%;height:200%;top:-50%;left:-50%;background:radial-gradient(circle at 30% 30%, rgba(0,255,120,0.15), transparent 40%),radial-gradient(circle at 70% 60%, rgba(0,255,100,0.12), transparent 40%),radial-gradient(circle at 50% 80%, rgba(0,255,80,0.1), transparent 40%);animation:liquid 12s infinite linear;z-index:-1;filter:blur(60px);}
+@keyframes liquid{0%{transform:rotate(0deg) scale(1);}50%{transform:rotate(180deg) scale(1.2);}100%{transform:rotate(360deg) scale(1);}}
+.hero{height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
+.glitch{font-size:50px;color:#00ff88;text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;}
 .system{text-align:center;padding:20px;}
-
-input{
-padding:12px;
-border:none;
-border-radius:10px;
-margin:8px;
-width:220px;
-text-align:center;
-}
-
-button{
-padding:12px 20px;
-margin:8px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-size:14px;
-transition:0.3s;
-}
-
+input{padding:12px;border:none;border-radius:10px;margin:8px;width:220px;text-align:center;}
+button{padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-size:14px;transition:0.3s;}
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
 .admin{background:gold;color:black;display:none;}
 .login-btn{background:#00cc66;color:black;font-weight:bold;}
 .logout{background:#ff0033;color:white;display:none;}
-
 button:hover{transform:scale(1.1);}
-
-.lists{
-display:flex;
-justify-content:center;
-gap:40px;
-margin-top:20px;
-flex-wrap:wrap;
-}
-
-.list-box{
-background:#111;
-padding:15px;
-border-radius:10px;
-min-width:200px;
-border:1px solid #00ff8850;
-}
-
-#tournamentDisplay{
-margin-top:20px;
-}
-
-/* POPUP */
-#popup{
-position:fixed;
-top:0;
-left:0;
-width:100%;
-height:100%;
-background:rgba(0,0,0,0.8);
-display:none;
-align-items:center;
-justify-content:center;
-}
-
-.popup-box{
-background:#111;
-padding:30px;
-border-radius:15px;
-text-align:center;
-box-shadow:0 0 20px #00ff88;
-}
-
+.lists{display:flex;justify-content:center;gap:40px;margin-top:20px;flex-wrap:wrap;}
+.list-box{background:#111;padding:15px;border-radius:10px;min-width:200px;border:1px solid #00ff8850;}
+#tournamentDisplay{margin-top:20px;}
+#popup{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;}
+.popup-box{background:#111;padding:30px;border-radius:15px;text-align:center;box-shadow:0 0 20px #00ff88;}
 </style>
 </head>
-
 <body>
 
 <section class="hero">
@@ -159,11 +60,12 @@ box-shadow:0 0 20px #00ff88;
 
 <div class="lists">
 <div class="list-box">
-<h3>🟢 Présents</h3>
+<h3 id="presentTitle">🟢 Présents (0)</h3>
 <ul id="presentList"></ul>
 </div>
+
 <div class="list-box">
-<h3>🔴 Absents</h3>
+<h3 id="absentTitle">🔴 Absents (0)</h3>
 <ul id="absentList"></ul>
 </div>
 </div>
@@ -180,34 +82,52 @@ box-shadow:0 0 20px #00ff88;
 </div>
 </div>
 
-<script>
+<!-- Firebase -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
+<script>
+const firebaseConfig = {
+  apiKey: "VOTRE_API_KEY",
+  authDomain: "VOTRE_PROJECT.firebaseapp.com",
+  databaseURL: "https://VOTRE_PROJECT.firebaseio.com",
+  projectId: "VOTRE_PROJECT",
+  storageBucket: "VOTRE_PROJECT.appspot.com",
+  messagingSenderId: "SENDER_ID",
+  appId: "APP_ID"
+};
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+</script>
+
+<script>
 const ADMINS = [
 { id:"j.carton", pass:"M0t de p@&se" },
 { id:"ohgabriil2a", pass:"As0racle2a1" }
 ];
-
-const WEBHOOK = "https://discord.com/api/webhooks/1485938598912987217/TEaxEsSxThv8dGPZDM23QNs8jWUWC_lsIF7TipbhJqvjNz1tJTlO-3buZQw_YKlI_p2_";
+const WEBHOOK = "https://discord.com/api/webhooks/...";
 const SITE = "https://toxic-esport-app.netlify.app/";
 
-let present = JSON.parse(localStorage.getItem("present"))||[];
-let absent = JSON.parse(localStorage.getItem("absent"))||[];
-let tournament = JSON.parse(localStorage.getItem("tournament"))||null;
-let isAdmin = localStorage.getItem("admin") === "true";
+let present = [];
+let absent = [];
+let tournament = null;
+let isAdmin = localStorage.getItem("admin")==="true";
 
+// ===== DISCORD =====
 function sendDiscord(title, desc){
 fetch(WEBHOOK,{
 method:"POST",
 headers:{"Content-Type":"application/json"},
 body:JSON.stringify({
+content: "@ToXiC @everyone",
 embeds:[{
-title:title,
-description:desc + `
+title: title,
+description: desc + `
 
 📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent
 
 ℹ️ Instructions :
-Pour indiquer votre présence ou votre absence, cliquez sur le lien du site,
+Cliquez sur le lien du site,
 entrez votre pseudo puis appuyez sur "Présent" ou "Absent".
 
 🔗 Accéder au site : ` + SITE,
@@ -217,6 +137,7 @@ color:65280
 });
 }
 
+// ===== ADMIN =====
 function updateAdminUI(){
 document.querySelectorAll(".admin").forEach(btn=>{
 btn.style.display = isAdmin ? "inline-block" : "none";
@@ -225,133 +146,85 @@ document.querySelector(".logout").style.display = isAdmin ? "inline-block" : "no
 }
 
 function loginAdmin(){
-let id=adminId.value;
-let pass=adminPass.value;
-
+let id = adminId.value;
+let pass = adminPass.value;
 if(ADMINS.find(a=>a.id===id && a.pass===pass)){
-isAdmin = true;
+isAdmin=true;
 localStorage.setItem("admin","true");
 updateAdminUI();
 closePopup();
 alert("Connexion réussie");
-}else{
-alert("Identifiants incorrects");
+}else{alert("Identifiants incorrects");}
 }
-}
-
-function logout(){
-isAdmin = false;
-localStorage.removeItem("admin");
-updateAdminUI();
-alert("Déconnecté");
-}
-
+function logout(){isAdmin=false; localStorage.removeItem("admin"); updateAdminUI(); alert("Déconnecté");}
 function openPopup(){popup.style.display="flex";}
 function closePopup(){popup.style.display="none";}
 
+// ===== PRESENCE =====
 function setPresence(isPresent){
-let pseudo=document.getElementById("pseudo").value.trim();
-if(!pseudo){alert("Entre ton pseudo !");return;}
-
-present = present.filter(p=>p!==pseudo);
-absent = absent.filter(p=>p!==pseudo);
-
-if(isPresent) present.push(pseudo);
-else absent.push(pseudo);
-
-save();
-render();
+let pseudo = document.getElementById("pseudo").value.trim();
+if(!pseudo){alert("Entre ton pseudo !"); return;}
+if(isPresent){
+db.ref('present/'+pseudo).set(true);
+db.ref('absent/'+pseudo).remove();
+}else{
+db.ref('absent/'+pseudo).set(true);
+db.ref('present/'+pseudo).remove();
+}
 document.getElementById("pseudo").value="";
 }
 
+// ===== TOURNOI =====
 function createTournament(){
-let name=prompt("Nom du tournoi ?");
-let date=prompt("Date ?");
-let time=prompt("Heure ?");
-let max=prompt("Nombre de joueurs max par équipe ?");
-
-if(!name)return;
-
-tournament={name,date,time,max};
-
-sendDiscord(
-"🏆 Nouveau tournoi",
-`Nom : **${name}**
-📅 Date : ${date}
-⏰ Heure : ${time}
-👥 Joueurs max / équipe : ${max}`
-);
-
-save();
-render();
-}
-
-function editTournament(){
-if(!tournament){alert("Aucun tournoi");return;}
-
-let name=prompt("Nom",tournament.name);
-let date=prompt("Date",tournament.date);
-let time=prompt("Heure",tournament.time);
-let max=prompt("Joueurs max",tournament.max);
-
-tournament={name,date,time,max};
-
-sendDiscord(
-"✏️ Tournoi modifié",
-`Nom : **${name}**
-📅 Date : ${date}
-⏰ Heure : ${time}
-👥 Joueurs max / équipe : ${max}`
-);
-
-save();
-render();
-}
-
-function deleteTournament(){
-if(!tournament){alert("Aucun tournoi");return;}
-
-if(confirm("Supprimer tournoi ?")){
-tournament=null;
-
-sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
-
-save();
-render();
-}
-}
-
-function removePlayer(){
-let name=prompt("Pseudo à supprimer ?");
+let name = prompt("Nom du tournoi ?"), date = prompt("Date ?"), time = prompt("Heure ?"), max = prompt("Nombre de joueurs max par équipe ?");
 if(!name) return;
-
-present = present.filter(p=>p!==name);
-absent = absent.filter(p=>p!==name);
-
-save();
-render();
+tournament = {name,date,time,max};
+db.ref('tournament').set(tournament);
+sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**
+📅 Date : ${date}
+⏰ Heure : ${time}
+👥 Joueurs max / équipe : ${max}`);
 }
+function editTournament(){
+if(!tournament){alert("Aucun tournoi"); return;}
+let name = prompt("Nom",tournament.name), date = prompt("Date",tournament.date), time = prompt("Heure",tournament.time), max = prompt("Joueurs max",tournament.max);
+tournament = {name,date,time,max};
+db.ref('tournament').set(tournament);
+sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**
+📅 Date : ${date}
+⏰ Heure : ${time}
+👥 Joueurs max / équipe : ${max}`);
+}
+function deleteTournament(){if(!tournament){alert("Aucun tournoi"); return;} if(confirm("Supprimer tournoi ?")){tournament=null; db.ref('tournament').remove(); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");}}
 
+// ===== SUPPRIMER JOUEUR =====
+function removePlayer(){let name=prompt("Pseudo à supprimer ?"); if(!name) return; db.ref('present/'+name).remove(); db.ref('absent/'+name).remove();}
+
+// ===== RENDER =====
 function render(){
-presentList.innerHTML = present.map(p=>`<li>${p}</li>`).join("");
-absentList.innerHTML = absent.map(p=>`<li>${p}</li>`).join("");
+const presentList = document.getElementById("presentList");
+const absentList = document.getElementById("absentList");
+const presentTitle = document.getElementById("presentTitle");
+const absentTitle = document.getElementById("absentTitle");
+const tournamentDisplay = document.getElementById("tournamentDisplay");
 
-tournamentDisplay.innerHTML = tournament ?
-`<h3>🏆 ${tournament.name}</h3>
-<p>📅 ${tournament.date} - ⏰ ${tournament.time}</p>
-<p>👥 Max/équipe : ${tournament.max}</p>` : "";
+presentList.innerHTML = Object.keys(present||{}).map(p=>`<li>${p}</li>`).join("");
+absentList.innerHTML = Object.keys(absent||{}).map(p=>`<li>${p}</li>`).join("");
+presentTitle.textContent = `🟢 Présents (${Object.keys(present||{}).length})`;
+absentTitle.textContent = `🔴 Absents (${Object.keys(absent||{}).length})`;
+
+tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
 
-function save(){
-localStorage.setItem("present",JSON.stringify(present));
-localStorage.setItem("absent",JSON.stringify(absent));
-localStorage.setItem("tournament",JSON.stringify(tournament));
-}
+// ===== SYNC FIREBASE =====
+db.ref('present').on('value', snapshot => {present = snapshot.val()||{}; render();});
+db.ref('absent').on('value', snapshot => {absent = snapshot.val()||{}; render();});
+db.ref('tournament').on('value', snapshot => {tournament = snapshot.val(); render();});
 
+// ===== INIT =====
 updateAdminUI();
 render();
 
 </script>
-
 </body>
 </html>
