@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>TEAM TOXIC</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:'Orbitron',sans-serif;
+}
+
+/* ☢️ BACKGROUND RADIOACTIF */
+body{
+background: radial-gradient(circle at 50% 50%, #021b0f, #000);
+color:white;
+overflow-x:hidden;
+}
+
+/* LIQUID EFFECT */
+body::before{
+content:"";
+position:fixed;
+width:200%;
+height:200%;
+top:-50%;
+left:-50%;
+background:
+radial-gradient(circle at 30% 30%, rgba(0,255,120,0.15), transparent 40%),
+radial-gradient(circle at 70% 60%, rgba(0,255,100,0.12), transparent 40%),
+radial-gradient(circle at 50% 80%, rgba(0,255,80,0.1), transparent 40%);
+animation:liquid 12s infinite linear;
+z-index:-1;
+filter:blur(60px);
+}
+
+@keyframes liquid{
+0%{transform:rotate(0deg) scale(1);}
+50%{transform:rotate(180deg) scale(1.2);}
+100%{transform:rotate(360deg) scale(1);}
+}
+
+/* HEADER */
+header{
+display:flex;
+justify-content:space-between;
+align-items:center;
+padding:20px 5%;
+background:rgba(0,0,0,0.7);
+backdrop-filter:blur(10px);
+}
+
+header h1{
+color:#00ff88;
+font-size:20px;
+}
+
+nav a{
+margin-left:15px;
+color:white;
+text-decoration:none;
+font-size:13px;
+}
+
+/* HERO */
+.hero{
+height:85vh;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+text-align:center;
+}
+
+.glitch{
+font-size:50px;
+color:#00ff88;
+text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+}
+
+/* SECTIONS */
+section{
+padding:60px 5%;
+}
+
+.section-title{
+font-size:28px;
+color:#00ff88;
+margin-bottom:30px;
+}
+
+/* BUTTON */
+.btn{
+display:inline-block;
+margin-top:15px;
+padding:12px 30px;
+background:linear-gradient(45deg,#00ff88,#00cc66);
+border-radius:30px;
+color:black;
+text-decoration:none;
+font-size:13px;
+font-weight:bold;
+box-shadow:0 0 15px #00ff88;
+}
+
+/* FOOTER */
+footer{
+text-align:center;
+padding:25px;
+background:#000;
+font-size:12px;
+}
+
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>TEAM TOXIC</h1>
+<nav>
+<a href="#about">Team</a>
+<a href="#roster">Roster</a>
+<a href="#partners">Partenaires</a>
+</nav>
+</header>
+
+<section class="hero">
+<h2 class="glitch">☣️ TEAM TOXIC ☣️</h2>
+<p>WARZONE ONLY</p>
+<a class="btn" href="https://discord.gg/zZj6akTS5Y">REJOINDRE</a>
+</section>
+
+<section id="about">
+<h2 class="section-title">Présentation</h2>
+
+<p style="line-height:1.8;max-width:800px;">
+☣️ TEAM TOXIC – WARZONE ☣️<br><br>
+
+La Team Toxic est une équipe compétitive dédiée exclusivement à Call of Duty: Warzone.<br>
+Créée par des joueurs passionnés, notre team repose sur une seule chose : la victoire.<br>
+Chaque partie est jouée avec sérieux, intensité et une mentalité de gagnant.<br><br>
+
+🎯 Notre vision Warzone<br>
+Warzone n’est pas qu’un BR, c’est un jeu de décisions rapides, de positionnement intelligent et de communication parfaite.<br>
+Chez Team Toxic, chaque rotation est réfléchie, chaque push est callé, chaque fight est assumé.<br><br>
+
+🎮 Style de jeu<br>
+Gameplay agressif mais maîtrisé<br>
+Push coordonnés et clean<br>
+Rotations intelligentes en fin de zone<br>
+Priorité au collectif avant le solo play<br><br>
+
+💬 Communication & discipline<br>
+Calls clairs et précis<br>
+Zéro cri inutile, zéro tilt<br>
+Respect strict des calls IGL<br>
+Analyse des games pour progresser<br><br>
+
+🧠 Mentalité Toxic<br>
+Calme sous pression<br>
+Rage de gagner jusqu’à la dernière zone<br>
+Dépassement de soi constant<br>
+Respect hors game, pression maximale en game<br><br>
+
+🏆 Objectifs<br>
+Performances en ranked Warzone<br>
+Participation à des tournois & événements<br>
+Construction d’un roster solide et fiable<br>
+Représenter la Team Toxic avec sérieux et fierté<br><br>
+
+🖤 Rejoindre la Team Toxic, c’est accepter l’exigence, la discipline et la compétition.<br>
+Ici, personne ne joue pour briller seul : on gagne ensemble ou on apprend ensemble.<br><br>
+
+TEAM TOXIC – WARZONE ONLY.<br>
+NO EXCUSES. NO FEAR. ONLY WINS.
+</p>
+
+</section>
+
+<section id="roster">
+<h2 class="section-title">Roster</h2>
+<p>Roster en cours de construction...</p>
+</section>
+
+<section id="partners">
+<h2 class="section-title">Partenaires</h2>
+
+<p>Aucun partenaire pour le moment.</p>
+
+</section>
+
+<footer>
+<p>© 2026 TEAM TOXIC</p>
+</footer>
+
+</body>
+</html>
