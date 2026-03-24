@@ -80,9 +80,9 @@ button:hover{transform:scale(1.1);}
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
 
-// === FIREBASE CONFIG ===
+// Firebase config
 const firebaseConfig = {
   apiKey: "AIzaSyBdLM-v9HlqIj2v7k1Z7idphIPyVK3GLlk",
   authDomain: "xeno-esport.firebaseapp.com",
@@ -94,12 +94,12 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// === ADMIN & DISCORD ===
+// Admin & Discord
 const ADMINS = [
   { id:"j.carton", pass:"M0t de p@&se" },
   { id:"ohgabriil2a", pass:"As0racle2a1" }
 ];
-const WEBHOOK = "https://discord.com/api/webhooks/1485952876374130872/r7x32yNQKqbNs-p7nLj7kEOgPhhd_RsAB8UQvVaE2OT_yS8Wl1JV0__V2GHYPSUU7btS";
+const WEBHOOK = "https://discord.com/api/webhooks/1485952876374130872/r7x32yNQKqbNs-p7nLj7kEOgPhhd_RsAB8Wl1JV0__V2GHYPSUU7btS";
 const SITE = "https://toxic-esport-app.netlify.app/";
 
 let present = {};
@@ -109,7 +109,7 @@ let isAdmin = localStorage.getItem("admin")==="true";
 
 function sanitizePseudo(p){ return p.replace(/[.#$[\]]/g,"_"); }
 
-// === RENDER LISTES ===
+// Render function
 function render(){
   document.getElementById("presentList").innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
   document.getElementById("absentList").innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
@@ -118,109 +118,51 @@ function render(){
   document.getElementById("tournamentDisplay").innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
 
-// === PRESENCE ===
+// Presence
 async function setPresence(isPresent){
   const pseudo = document.getElementById("pseudo").value.trim();
   if(!pseudo){ alert("Entre ton pseudo !"); return; }
   const key = sanitizePseudo(pseudo);
   const targetCol = isPresent ? 'present' : 'absent';
   const otherCol = isPresent ? 'absent' : 'present';
-  
-  await setDoc(doc(db, targetCol, key), {name:pseudo});
-  await deleteDoc(doc(db, otherCol, key));
+  await setDoc(doc(db,targetCol,key),{name:pseudo});
+  await deleteDoc(doc(db,otherCol,key));
   document.getElementById("pseudo").value="";
 }
 
-// === ADMIN FUNCTIONS ===
-function loginAdmin(){
-  const id = adminId.value;
-  const pass = adminPass.value;
-  if(ADMINS.find(a=>a.id===id && a.pass===pass)){
-    isAdmin=true; localStorage.setItem("admin","true"); updateAdminUI(); closePopup(); alert("Connexion réussie");
-  } else alert("Identifiants incorrects");
-}
-function logout(){ isAdmin=false; localStorage.removeItem("admin"); updateAdminUI(); alert("Déconnecté"); }
-function updateAdminUI(){ document.querySelectorAll(".admin").forEach(b=>b.style.display=isAdmin?"inline-block":"none"); document.querySelector(".logout").style.display=isAdmin?"inline-block":"none"; }
-function openPopup(){popup.style.display="flex";} 
+// Admin functions
+function loginAdmin(){const id=adminId.value;const pass=adminPass.value;if(ADMINS.find(a=>a.id===id && a.pass===pass)){isAdmin=true;localStorage.setItem("admin","true");updateAdminUI();closePopup();alert("Connexion réussie");}else alert("Identifiants incorrects");}
+function logout(){isAdmin=false;localStorage.removeItem("admin");updateAdminUI();alert("Déconnecté");}
+function updateAdminUI(){document.querySelectorAll(".admin").forEach(b=>b.style.display=isAdmin?"inline-block":"none");document.querySelector(".logout").style.display=isAdmin?"inline-block":"none";}
+function openPopup(){popup.style.display="flex";}
 function closePopup(){popup.style.display="none";}
 
-// === TOURNAMENT ===
-async function createTournament(){
-  const name = prompt("Nom du tournoi ?"), date = prompt("Date ?"), time = prompt("Heure ?"), max = prompt("Nombre de joueurs max par équipe ?");
-  if(!name) return;
-  tournament={name,date,time,max};
-  await setDoc(doc(db,'tournament','info'), tournament);
-  sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
-}
-async function editTournament(){
-  if(!tournament){alert("Aucun tournoi");return;}
-  const name = prompt("Nom",tournament.name), date = prompt("Date",tournament.date), time = prompt("Heure",tournament.time), max = prompt("Joueurs max",tournament.max);
-  tournament={name,date,time,max};
-  await setDoc(doc(db,'tournament','info'), tournament);
-  sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
-}
-async function deleteTournament(){
-  if(!tournament){alert("Aucun tournoi");return;}
-  if(confirm("Supprimer tournoi ?")){
-    tournament=null;
-    await deleteDoc(doc(db,'tournament','info'));
-    sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
-  }
-}
-async function removePlayer(){
-  const name = prompt("Pseudo à supprimer ?");
-  if(!name) return;
-  const key = sanitizePseudo(name);
-  await deleteDoc(doc(db,'present',key));
-  await deleteDoc(doc(db,'absent',key));
-}
-async function resetPresence(){
-  if(confirm("Réinitialiser toutes les présences/absences ?")){
-    // Supprime tous les documents
-    const presentSnap = await getDocs(collection(db,'present'));
-    presentSnap.forEach(d=>deleteDoc(doc(db,'present',d.id)));
-    const absentSnap = await getDocs(collection(db,'absent'));
-    absentSnap.forEach(d=>deleteDoc(doc(db,'absent',d.id)));
-  }
-}
+// Tournament
+async function createTournament(){let name=prompt("Nom du tournoi ?"),date=prompt("Date ?"),time=prompt("Heure ?"),max=prompt("Nombre de joueurs max par équipe ?");if(!name) return;tournament={name,date,time,max};await setDoc(doc(db,'tournament','info'),tournament);sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);}
+async function editTournament(){if(!tournament){alert("Aucun tournoi");return;}let name=prompt("Nom",tournament.name),date=prompt("Date",tournament.date),time=prompt("Heure",tournament.time),max=prompt("Joueurs max",tournament.max);tournament={name,date,time,max};await setDoc(doc(db,'tournament','info'),tournament);sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);}
+async function deleteTournament(){if(!tournament){alert("Aucun tournoi");return;}if(confirm("Supprimer tournoi ?")){tournament=null;await deleteDoc(doc(db,'tournament','info'));sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");}}
+async function removePlayer(){let name=prompt("Pseudo à supprimer ?");if(!name) return;let key=sanitizePseudo(name);await deleteDoc(doc(db,'present',key));await deleteDoc(doc(db,'absent',key));}
+async function resetPresence(){if(confirm("Réinitialiser toutes les présences/absences ?")){const pSnap=await getDocs(collection(db,'present'));pSnap.forEach(d=>deleteDoc(doc(db,'present',d.id)));const aSnap=await getDocs(collection(db,'absent'));aSnap.forEach(d=>deleteDoc(doc(db,'absent',d.id)));}}
 
-// === DISCORD ===
-function sendDiscord(title,desc){
-  fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
-    content:"@ToXiC @everyone",
-    embeds:[{title:title,description:desc+`\n📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent\nℹ️ Instructions : Cliquez sur le lien du site, entrez votre pseudo puis appuyez sur "Présent" ou "Absent".\n🔗 Accéder au site : ${SITE}`,color:65280}]
-  })});
-}
+// Discord
+function sendDiscord(title,desc){fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:"@ToXiC @everyone",embeds:[{title:title,description:desc+`\n📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent\nℹ️ Instructions : Cliquez sur le lien du site, entrez votre pseudo puis appuyez sur "Présent" ou "Absent".\n🔗 Accéder au site : ${SITE}`,color:65280}]})});}
 
-// === FIRESTORE SYNC ===
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
+// Firestore Sync
+onSnapshot(collection(db,'present'),snap=>{present={};snap.forEach(doc=>present[doc.id]=doc.data());render();});
+onSnapshot(collection(db,'absent'),snap=>{absent={};snap.forEach(doc=>absent[doc.id]=doc.data());render();});
+onSnapshot(doc(db,'tournament','info'),snap=>{tournament=snap.exists()?snap.data():null;render();});
 
-onSnapshot(collection(db,'present'), snapshot => {
-  present = {};
-  snapshot.forEach(doc => { present[doc.id] = doc.data(); });
-  render();
-});
-onSnapshot(collection(db,'absent'), snapshot => {
-  absent = {};
-  snapshot.forEach(doc => { absent[doc.id] = doc.data(); });
-  render();
-});
-onSnapshot(doc(db,'tournament','info'), snapshot=>{
-  tournament = snapshot.exists() ? snapshot.data() : null;
-  render();
-});
-
-// === EXPOSE FUNCTIONS GLOBALEMENT ===
-window.setPresence = setPresence;
-window.loginAdmin = loginAdmin;
-window.logout = logout;
-window.openPopup = openPopup;
-window.closePopup = closePopup;
-window.createTournament = createTournament;
-window.editTournament = editTournament;
-window.deleteTournament = deleteTournament;
-window.removePlayer = removePlayer;
-window.resetPresence = resetPresence;
+// Expose functions globally
+window.setPresence=setPresence;
+window.loginAdmin=loginAdmin;
+window.logout=logout;
+window.openPopup=openPopup;
+window.closePopup=closePopup;
+window.createTournament=createTournament;
+window.editTournament=editTournament;
+window.deleteTournament=deleteTournament;
+window.removePlayer=removePlayer;
+window.resetPresence=resetPresence;
 
 </script>
 </body>
