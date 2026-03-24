@@ -29,13 +29,16 @@ button:hover{transform:scale(1.1);}
 </style>
 </head>
 <body>
+
 <section class="hero">
 <h1 class="glitch">☣️ TEAM TOXIC ☣️</h1>
 <p>Système de présence team</p>
 </section>
 
 <section class="system">
+
 <input type="text" id="pseudo" placeholder="Entre ton pseudo">
+
 <div>
 <button class="present" onclick="setPresence(true)">Présent</button>
 <button class="absent" onclick="setPresence(false)">Absent</button>
@@ -59,11 +62,13 @@ button:hover{transform:scale(1.1);}
 <h3 id="presentTitle">🟢 Présents (0)</h3>
 <ul id="presentList"></ul>
 </div>
+
 <div class="list-box">
 <h3 id="absentTitle">🔴 Absents (0)</h3>
 <ul id="absentList"></ul>
 </div>
 </div>
+
 </section>
 
 <div id="popup">
@@ -94,10 +99,10 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ADMIN
+// ADMIN & DISCORD
 const ADMINS = [
-{ id:"j.carton", pass:"M0t de p@&se" },
-{ id:"ohgabriil2a", pass:"As0racle2a1" }
+  { id:"j.carton", pass:"M0t de p@&se" },
+  { id:"ohgabriil2a", pass:"As0racle2a1" }
 ];
 const WEBHOOK = "https://discord.com/api/webhooks/1485952876374130872/r7x32yNQKqbNs-p7nLj7kEOgPhhd_RsAB8UQvVaE2OT_yS8Wl1JV0__V2GHYPSUU7btS";
 const SITE = "https://toxic-esport-app.netlify.app/";
@@ -107,7 +112,7 @@ let absent = {};
 let tournament = null;
 let isAdmin = localStorage.getItem("admin")==="true";
 
-// UTIL
+// UTILS
 function sanitizePseudo(pseudo){ return pseudo.replace(/[.#$[\]]/g,"_"); }
 function render(){
   const presentList = document.getElementById("presentList");
