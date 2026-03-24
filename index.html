@@ -17,7 +17,7 @@ color:white;
 overflow-x:hidden;
 }
 
-/* ☢️ BACKGROUND RADIOACTIF */
+/* ☢️ BACKGROUND */
 body::before{
 content:"";
 position:fixed;
@@ -35,12 +35,11 @@ filter:blur(60px);
 }
 
 @keyframes liquid{
-0%{transform:rotate(0deg) scale(1);}
-50%{transform:rotate(180deg) scale(1.2);}
-100%{transform:rotate(360deg) scale(1);}
+0%{transform:rotate(0deg);}
+50%{transform:rotate(180deg);}
+100%{transform:rotate(360deg);}
 }
 
-/* HERO */
 .hero{
 height:40vh;
 display:flex;
@@ -52,61 +51,42 @@ flex-direction:column;
 .glitch{
 font-size:50px;
 color:#00ff88;
-text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+text-shadow:0 0 10px #00ff88;
 }
 
-/* SYSTEM */
 .system{text-align:center;padding:20px;}
 
 input{
-padding:12px;
+padding:10px;
 border:none;
 border-radius:10px;
-margin:8px;
-width:220px;
+margin:5px;
 text-align:center;
 }
 
 button{
-padding:12px 20px;
-margin:8px;
+padding:10px 15px;
+margin:5px;
 border:none;
 border-radius:10px;
 cursor:pointer;
-font-size:14px;
-transition:0.3s;
 }
 
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
-.admin{background:gold;color:black;display:none;}
-.login-btn{background:#00cc66;color:black;font-weight:bold;}
-
-button:hover{transform:scale(1.1);}
-
-.lists{
-display:flex;
-justify-content:center;
-gap:40px;
-margin-top:20px;
-flex-wrap:wrap;
-}
+.admin{background:gold;display:none;}
+.login-btn{background:#00cc66;}
 
 .list-box{
 background:#111;
 padding:15px;
 border-radius:10px;
-min-width:200px;
-border:1px solid #00ff8850;
-}
-
-/* TOURNOI */
-#tournamentDisplay{
-margin-top:20px;
+margin:10px;
+display:inline-block;
 }
 
 /* POPUP */
-#popup{
+#popup,#tournoiPopup{
 position:fixed;
 top:0;
 left:0;
@@ -114,13 +94,13 @@ width:100%;
 height:100%;
 background:rgba(0,0,0,0.8);
 display:none;
-align-items:center;
 justify-content:center;
+align-items:center;
 }
 
 .popup-box{
 background:#111;
-padding:30px;
+padding:25px;
 border-radius:15px;
 text-align:center;
 box-shadow:0 0 20px #00ff88;
@@ -133,180 +113,159 @@ box-shadow:0 0 20px #00ff88;
 
 <section class="hero">
 <h1 class="glitch">☣️ TEAM TOXIC ☣️</h1>
-<p>Système de présence team</p>
+<p>Système de présence</p>
 </section>
 
 <section class="system">
 
-<input type="text" id="pseudo" placeholder="Entre ton pseudo">
+<input type="text" id="pseudo" placeholder="Pseudo"><br>
 
-<div>
 <button class="present" onclick="setPresence(true)">Présent</button>
-<button class="absent" onclick="setPresence(false)">Absent</button>
-</div>
+<button class="absent" onclick="setPresence(false)">Absent</button><br>
 
-<button class="login-btn" onclick="openPopup()">Connexion Admin</button>
+<button class="login-btn" onclick="openLogin()">Connexion Admin</button>
 
-<!-- ADMIN -->
 <div>
-<button id="createBtn" class="admin" onclick="createTournament()">Créer tournoi</button>
-<button id="editBtn" class="admin" onclick="editTournament()">Modifier tournoi</button>
-<button id="deleteBtn" class="admin" onclick="deleteTournament()">Supprimer tournoi</button>
-<button id="removePlayerBtn" class="admin" onclick="removePlayer()">Supprimer joueur</button>
+<button class="admin" onclick="openTournoi()">Créer tournoi</button>
+<button class="admin" onclick="editTournament()">Modifier tournoi</button>
+<button class="admin" onclick="deleteTournament()">Supprimer tournoi</button>
+<button class="admin" onclick="removePlayer()">Supprimer joueur</button>
 </div>
 
-<!-- TOURNOI -->
 <div id="tournamentDisplay"></div>
 
-<div class="lists">
 <div class="list-box">
 <h3>🟢 Présents</h3>
 <ul id="presentList"></ul>
 </div>
+
 <div class="list-box">
 <h3>🔴 Absents</h3>
 <ul id="absentList"></ul>
 </div>
-</div>
 
 </section>
 
-<!-- POPUP LOGIN -->
+<!-- LOGIN -->
 <div id="popup">
 <div class="popup-box">
 <h3>Connexion Admin</h3>
-<input type="text" id="adminId" placeholder="Identifiant"><br>
-<input type="password" id="adminPass" placeholder="Mot de passe"><br>
-<button onclick="loginAdmin()">Valider</button><br>
-<button onclick="closePopup()">Fermer</button>
+<input id="adminId" placeholder="Identifiant"><br>
+<input id="adminPass" type="password" placeholder="Mot de passe"><br>
+<button onclick="loginAdmin()">Valider</button>
+</div>
+</div>
+
+<!-- TOURNOI FORM -->
+<div id="tournoiPopup">
+<div class="popup-box">
+<h3>Créer Tournoi</h3>
+<input id="tName" placeholder="Nom du tournoi"><br>
+<input id="tDate" type="date"><br>
+<input id="tTime" type="time"><br>
+<input id="tPlayers" type="number" placeholder="Joueurs max"><br>
+<button onclick="saveTournament()">Valider</button>
 </div>
 </div>
 
 <script>
 
-// ===== DATA =====
+// DATA
 let presentPlayers=JSON.parse(localStorage.getItem("present"))||[];
 let absentPlayers=JSON.parse(localStorage.getItem("absent"))||[];
 let tournament=JSON.parse(localStorage.getItem("tournament"))||null;
 
-// ===== RENDER =====
-function renderLists(){
-const presentList=document.getElementById("presentList");
-const absentList=document.getElementById("absentList");
+// RENDER
+function render(){
+let pList=document.getElementById("presentList");
+let aList=document.getElementById("absentList");
+let tDiv=document.getElementById("tournamentDisplay");
 
-presentList.innerHTML="";
-absentList.innerHTML="";
+pList.innerHTML=""; aList.innerHTML=""; tDiv.innerHTML="";
 
-presentPlayers.forEach(p=>{
-let li=document.createElement("li");
-li.textContent=p;
-presentList.appendChild(li);
-});
-
-absentPlayers.forEach(p=>{
-let li=document.createElement("li");
-li.textContent=p;
-absentList.appendChild(li);
-});
-
-renderTournament();
-}
-
-function renderTournament(){
-const display=document.getElementById("tournamentDisplay");
-display.innerHTML="";
+presentPlayers.forEach(p=>pList.innerHTML+=`<li>${p}</li>`);
+absentPlayers.forEach(p=>aList.innerHTML+=`<li>${p}</li>`);
 
 if(tournament){
-let div=document.createElement("div");
-div.innerHTML=`<h3>🏆 ${tournament.name}</h3>`;
-display.appendChild(div);
+tDiv.innerHTML=`
+<div class="list-box">
+<h3>🏆 ${tournament.name}</h3>
+<p>📅 ${tournament.date}</p>
+<p>⏰ ${tournament.time}</p>
+<p>👥 ${tournament.players} joueurs max</p>
+</div>`;
 }
 }
 
-function saveData(){
+// SAVE
+function save(){
 localStorage.setItem("present",JSON.stringify(presentPlayers));
 localStorage.setItem("absent",JSON.stringify(absentPlayers));
 localStorage.setItem("tournament",JSON.stringify(tournament));
 }
 
-// ===== PRESENCE =====
-function setPresence(isPresent){
-let pseudo=document.getElementById("pseudo").value.trim();
-if(!pseudo){alert("Entre ton pseudo !");return;}
-
-presentPlayers=presentPlayers.filter(p=>p!==pseudo);
-absentPlayers=absentPlayers.filter(p=>p!==pseudo);
-
-if(isPresent){presentPlayers.push(pseudo);}
-else{absentPlayers.push(pseudo);}
-
-saveData();
-renderLists();
-document.getElementById("pseudo").value="";
+// PRESENCE
+function setPresence(state){
+let p=document.getElementById("pseudo").value;
+if(!p)return alert("Pseudo ?");
+presentPlayers=presentPlayers.filter(x=>x!==p);
+absentPlayers=absentPlayers.filter(x=>x!==p);
+state?presentPlayers.push(p):absentPlayers.push(p);
+save(); render();
 }
 
-// ===== ADMIN LOGIN =====
+// ADMIN
 const ADMIN_ID="230851";
 const ADMIN_PASS="test.test";
 
 function loginAdmin(){
-let id=document.getElementById("adminId").value;
-let pass=document.getElementById("adminPass").value;
-
-if(id===ADMIN_ID && pass===ADMIN_PASS){
-document.querySelectorAll(".admin").forEach(btn=>btn.style.display="inline-block");
-closePopup();
-alert("Connexion réussie");
-}else{
-alert("Identifiants incorrects");
+if(adminId.value===ADMIN_ID && adminPass.value===ADMIN_PASS){
+document.querySelectorAll(".admin").forEach(b=>b.style.display="inline-block");
+popup.style.display="none";
 }
 }
 
-// ===== POPUP =====
-function openPopup(){document.getElementById("popup").style.display="flex";}
-function closePopup(){document.getElementById("popup").style.display="none";}
+// POPUPS
+function openLogin(){popup.style.display="flex";}
+function openTournoi(){tournoiPopup.style.display="flex";}
 
-// ===== TOURNOI =====
-function createTournament(){
-let name=prompt("Nom du tournoi ?");
-if(!name) return;
-tournament={name:name};
-saveData();
-renderLists();
+// TOURNOI
+function saveTournament(){
+tournament={
+name:tName.value,
+date:tDate.value,
+time:tTime.value,
+players:tPlayers.value
+};
+save(); render();
+tournoiPopup.style.display="none";
 }
 
 function editTournament(){
-if(!tournament){alert("Aucun tournoi");return;}
-let name=prompt("Nouveau nom :",tournament.name);
-if(!name) return;
-tournament.name=name;
-saveData();
-renderLists();
+if(!tournament)return alert("Aucun tournoi");
+openTournoi();
+tName.value=tournament.name;
+tDate.value=tournament.date;
+tTime.value=tournament.time;
+tPlayers.value=tournament.players;
 }
 
 function deleteTournament(){
-if(!tournament){alert("Aucun tournoi");return;}
-if(confirm("Supprimer tournoi ?")){
-tournament=null;
-saveData();
-renderLists();
+if(confirm("Supprimer ?")){
+tournament=null; save(); render();
 }
 }
 
-// ===== SUPPRIMER JOUEUR =====
+// REMOVE PLAYER
 function removePlayer(){
-let name=prompt("Pseudo à supprimer ?");
-if(!name) return;
-
+let name=prompt("Pseudo ?");
 presentPlayers=presentPlayers.filter(p=>p!==name);
 absentPlayers=absentPlayers.filter(p=>p!==name);
-
-saveData();
-renderLists();
+save(); render();
 }
 
 // INIT
-window.onload=renderLists;
+render();
 
 </script>
 
