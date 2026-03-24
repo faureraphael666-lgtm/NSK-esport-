@@ -81,12 +81,11 @@ button:hover{transform:scale(1.1);}
 </div>
 </div>
 
-<!-- Firebase -->
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
-// CONFIG FIREBASE
+// === CONFIG FIREBASE ===
 const firebaseConfig = {
   apiKey: "VOTRE_API_KEY",
   authDomain: "VOTRE_PROJECT.firebaseapp.com",
@@ -99,7 +98,7 @@ const firebaseConfig = {
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
-// ADMIN & DISCORD
+// === ADMIN & DISCORD ===
 const ADMINS = [
   { id:"j.carton", pass:"M0t de p@&se" },
   { id:"ohgabriil2a", pass:"As0racle2a1" }
@@ -112,8 +111,9 @@ let absent = {};
 let tournament = null;
 let isAdmin = localStorage.getItem("admin")==="true";
 
-// UTILS
+// === UTILS ===
 function sanitizePseudo(pseudo){ return pseudo.replace(/[.#$[\]]/g,"_"); }
+
 function render(){
   const presentList = document.getElementById("presentList");
   const absentList = document.getElementById("absentList");
@@ -129,30 +129,27 @@ function render(){
   tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
 
-// PRESENCE
+// === PRESENCE ===
 function setPresence(isPresent){
   let pseudo = document.getElementById("pseudo").value.trim();
   if(!pseudo){ alert("Entre ton pseudo !"); return; }
   let key = sanitizePseudo(pseudo);
   let addList = isPresent ? 'present' : 'absent';
   let removeList = isPresent ? 'absent' : 'present';
-  // Supprimer de l'autre liste avant d'ajouter
-  db.ref(removeList + "/" + key).remove().then(()=>{
-    db.ref(addList + "/" + key).set({name: pseudo});
-    document.getElementById("pseudo").value = "";
+
+  // Supprimer de l'autre liste puis ajouter dans la bonne
+  db.ref(removeList+"/"+key).remove().finally(()=>{
+    db.ref(addList+"/"+key).set({name:pseudo});
+    document.getElementById("pseudo").value="";
   });
 }
 
-// ADMIN FUNCTIONS
+// === ADMIN FUNCTIONS ===
 function loginAdmin(){
   let id = adminId.value;
   let pass = adminPass.value;
   if(ADMINS.find(a=>a.id===id && a.pass===pass)){
-    isAdmin=true;
-    localStorage.setItem("admin","true");
-    updateAdminUI();
-    closePopup();
-    alert("Connexion réussie");
+    isAdmin=true; localStorage.setItem("admin","true"); updateAdminUI(); closePopup(); alert("Connexion réussie");
   } else alert("Identifiants incorrects");
 }
 function logout(){ isAdmin=false; localStorage.removeItem("admin"); updateAdminUI(); alert("Déconnecté"); }
@@ -160,11 +157,10 @@ function updateAdminUI(){ document.querySelectorAll(".admin").forEach(b=>b.style
 function openPopup(){popup.style.display="flex";} 
 function closePopup(){popup.style.display="none";}
 
-// TOURNAMENT
+// === TOURNAMENT ===
 function createTournament(){
   let name = prompt("Nom du tournoi ?"), date = prompt("Date ?"), time = prompt("Heure ?"), max = prompt("Nombre de joueurs max par équipe ?");
-  if(!name) return; tournament={name,date,time,max};
-  db.ref('tournament').set(tournament);
+  if(!name) return; tournament={name,date,time,max}; db.ref('tournament').set(tournament);
   sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
 }
 function editTournament(){
@@ -173,16 +169,19 @@ function editTournament(){
   tournament={name,date,time,max}; db.ref('tournament').set(tournament);
   sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
 }
-function deleteTournament(){ if(!tournament){alert("Aucun tournoi");return;} if(confirm("Supprimer tournoi ?")){tournament=null; db.ref('tournament').remove(); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé."); } }
+function deleteTournament(){ if(!tournament){alert("Aucun tournoi");return;} if(confirm("Supprimer tournoi ?")){ tournament=null; db.ref('tournament').remove(); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé."); } }
 function removePlayer(){ let name=prompt("Pseudo à supprimer ?"); if(!name) return; let key=sanitizePseudo(name); db.ref('present/'+key).remove(); db.ref('absent/'+key).remove(); }
 function resetPresence(){ if(confirm("Réinitialiser toutes les présences/absences ?")){ db.ref('present').remove(); db.ref('absent').remove(); } }
 
-// DISCORD
+// === DISCORD ===
 function sendDiscord(title,desc){
-  fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:"@ToXiC @everyone",embeds:[{title:title,description:desc+`\n📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent\nℹ️ Instructions : Cliquez sur le lien du site, entrez votre pseudo puis appuyez sur "Présent" ou "Absent".\n🔗 Accéder au site : ${SITE}`,color:65280}]})});
+  fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({
+    content:"@ToXiC @everyone",
+    embeds:[{title:title,description:desc+`\n📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent\nℹ️ Instructions : Cliquez sur le lien du site, entrez votre pseudo puis appuyez sur "Présent" ou "Absent".\n🔗 Accéder au site : ${SITE}`,color:65280}]
+  })});
 }
 
-// FIREBASE SYNC
+// === FIREBASE SYNC ===
 function initLists(){
   db.ref('present').once('value',snap=>{if(!snap.exists()) db.ref('present').set({});});
   db.ref('absent').once('value',snap=>{if(!snap.exists()) db.ref('absent').set({});});
