@@ -105,11 +105,12 @@ const ADMINS = [
 { id:"j.carton", pass:"M0t de p@&se" },
 { id:"ohgabriil2a", pass:"As0racle2a1" }
 ];
+
 const WEBHOOK = "https://discord.com/api/webhooks/1485952876374130872/r7x32yNQKqbNs-p7nLj7kEOgPhhd_RsAB8UQvVaE2OT_yS8Wl1JV0__V2GHYPSUU7btS";
 const SITE = "https://toxic-esport-app.netlify.app/";
 
-let present = [];
-let absent = [];
+let present = {};
+let absent = {};
 let tournament = null;
 let isAdmin = localStorage.getItem("admin")==="true";
 
@@ -156,7 +157,13 @@ closePopup();
 alert("Connexion réussie");
 }else{alert("Identifiants incorrects");}
 }
-function logout(){isAdmin=false; localStorage.removeItem("admin"); updateAdminUI(); alert("Déconnecté");}
+
+function logout(){
+isAdmin=false;
+localStorage.removeItem("admin");
+updateAdminUI();
+alert("Déconnecté");
+}
 function openPopup(){popup.style.display="flex";}
 function closePopup(){popup.style.display="none";}
 
@@ -164,6 +171,7 @@ function closePopup(){popup.style.display="none";}
 function setPresence(isPresent){
 let pseudo = document.getElementById("pseudo").value.trim();
 if(!pseudo){alert("Entre ton pseudo !"); return;}
+
 if(isPresent){
 db.ref('present/'+pseudo).set(true);
 db.ref('absent/'+pseudo).remove();
@@ -171,12 +179,16 @@ db.ref('absent/'+pseudo).remove();
 db.ref('absent/'+pseudo).set(true);
 db.ref('present/'+pseudo).remove();
 }
-document.getElementById("pseudo").value="";
+
+document.getElementById("pseudo").value=""; // 🔹 Ne pas appeler render() ici, Firebase fera le rendu
 }
 
 // ===== TOURNOI =====
 function createTournament(){
-let name = prompt("Nom du tournoi ?"), date = prompt("Date ?"), time = prompt("Heure ?"), max = prompt("Nombre de joueurs max par équipe ?");
+let name = prompt("Nom du tournoi ?");
+let date = prompt("Date ?");
+let time = prompt("Heure ?");
+let max = prompt("Nombre de joueurs max par équipe ?");
 if(!name) return;
 tournament = {name,date,time,max};
 db.ref('tournament').set(tournament);
@@ -185,9 +197,13 @@ sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**
 ⏰ Heure : ${time}
 👥 Joueurs max / équipe : ${max}`);
 }
+
 function editTournament(){
 if(!tournament){alert("Aucun tournoi"); return;}
-let name = prompt("Nom",tournament.name), date = prompt("Date",tournament.date), time = prompt("Heure",tournament.time), max = prompt("Joueurs max",tournament.max);
+let name = prompt("Nom",tournament.name);
+let date = prompt("Date",tournament.date);
+let time = prompt("Heure",tournament.time);
+let max = prompt("Joueurs max",tournament.max);
 tournament = {name,date,time,max};
 db.ref('tournament').set(tournament);
 sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**
@@ -195,10 +211,23 @@ sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**
 ⏰ Heure : ${time}
 👥 Joueurs max / équipe : ${max}`);
 }
-function deleteTournament(){if(!tournament){alert("Aucun tournoi"); return;} if(confirm("Supprimer tournoi ?")){tournament=null; db.ref('tournament').remove(); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");}}
+
+function deleteTournament(){
+if(!tournament){alert("Aucun tournoi"); return;}
+if(confirm("Supprimer tournoi ?")){
+tournament=null;
+db.ref('tournament').remove();
+sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
+}
+}
 
 // ===== SUPPRIMER JOUEUR =====
-function removePlayer(){let name=prompt("Pseudo à supprimer ?"); if(!name) return; db.ref('present/'+name).remove(); db.ref('absent/'+name).remove();}
+function removePlayer(){
+let name=prompt("Pseudo à supprimer ?");
+if(!name) return;
+db.ref('present/'+name).remove();
+db.ref('absent/'+name).remove();
+}
 
 // ===== RENDER =====
 function render(){
