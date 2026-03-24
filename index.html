@@ -4,9 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>TEAM TOXIC</title>
-
 <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap" rel="stylesheet">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;font-family:'Orbitron',sans-serif;}
 body{background:#000;color:white;overflow-x:hidden;}
@@ -31,16 +29,13 @@ button:hover{transform:scale(1.1);}
 </style>
 </head>
 <body>
-
 <section class="hero">
 <h1 class="glitch">☣️ TEAM TOXIC ☣️</h1>
 <p>Système de présence team</p>
 </section>
 
 <section class="system">
-
 <input type="text" id="pseudo" placeholder="Entre ton pseudo">
-
 <div>
 <button class="present" onclick="setPresence(true)">Présent</button>
 <button class="absent" onclick="setPresence(false)">Absent</button>
@@ -64,13 +59,11 @@ button:hover{transform:scale(1.1);}
 <h3 id="presentTitle">🟢 Présents (0)</h3>
 <ul id="presentList"></ul>
 </div>
-
 <div class="list-box">
 <h3 id="absentTitle">🔴 Absents (0)</h3>
 <ul id="absentList"></ul>
 </div>
 </div>
-
 </section>
 
 <div id="popup">
@@ -88,6 +81,7 @@ button:hover{transform:scale(1.1);}
 <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
 
 <script>
+// CONFIG FIREBASE
 const firebaseConfig = {
   apiKey: "VOTRE_API_KEY",
   authDomain: "VOTRE_PROJECT.firebaseapp.com",
@@ -99,14 +93,12 @@ const firebaseConfig = {
 };
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
-</script>
 
-<script>
+// ADMIN
 const ADMINS = [
 { id:"j.carton", pass:"M0t de p@&se" },
 { id:"ohgabriil2a", pass:"As0racle2a1" }
 ];
-
 const WEBHOOK = "https://discord.com/api/webhooks/1485952876374130872/r7x32yNQKqbNs-p7nLj7kEOgPhhd_RsAB8UQvVaE2OT_yS8Wl1JV0__V2GHYPSUU7btS";
 const SITE = "https://toxic-esport-app.netlify.app/";
 
@@ -115,158 +107,86 @@ let absent = {};
 let tournament = null;
 let isAdmin = localStorage.getItem("admin")==="true";
 
-// ===== DISCORD =====
-function sendDiscord(title, desc){
-fetch(WEBHOOK,{
-method:"POST",
-headers:{"Content-Type":"application/json"},
-body:JSON.stringify({
-content: "@ToXiC @everyone",
-embeds:[{
-title: title,
-description: desc + `
+// UTIL
+function sanitizePseudo(pseudo){ return pseudo.replace(/[.#$[\]]/g,"_"); }
+function render(){
+  const presentList = document.getElementById("presentList");
+  const absentList = document.getElementById("absentList");
+  const presentTitle = document.getElementById("presentTitle");
+  const absentTitle = document.getElementById("absentTitle");
+  const tournamentDisplay = document.getElementById("tournamentDisplay");
 
-📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent
+  presentList.innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
+  absentList.innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
+  presentTitle.textContent = `🟢 Présents (${Object.keys(present||{}).length})`;
+  absentTitle.textContent = `🔴 Absents (${Object.keys(absent||{}).length})`;
 
-ℹ️ Instructions :
-Cliquez sur le lien du site,
-entrez votre pseudo puis appuyez sur "Présent" ou "Absent".
-
-🔗 Accéder au site : ` + SITE,
-color:65280
-}]
-})
-});
+  tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
 }
 
-// ===== ADMIN =====
-function updateAdminUI(){
-document.querySelectorAll(".admin").forEach(btn=>{
-btn.style.display = isAdmin ? "inline-block" : "none";
-});
-document.querySelector(".logout").style.display = isAdmin ? "inline-block" : "none";
-}
-
-function loginAdmin(){
-let id = adminId.value;
-let pass = adminPass.value;
-if(ADMINS.find(a=>a.id===id && a.pass===pass)){
-isAdmin=true;
-localStorage.setItem("admin","true");
-updateAdminUI();
-closePopup();
-alert("Connexion réussie");
-}else{alert("Identifiants incorrects");}
-}
-
-function logout(){
-isAdmin=false;
-localStorage.removeItem("admin");
-updateAdminUI();
-alert("Déconnecté");
-}
-function openPopup(){popup.style.display="flex";}
-function closePopup(){popup.style.display="none";}
-
-// ===== PRESENCE =====
-function sanitizePseudo(pseudo){
-  return pseudo.replace(/[.#$[\]]/g,"_");
-}
-
+// PRESENCE
 function setPresence(isPresent){
   let pseudo = document.getElementById("pseudo").value.trim();
   if(!pseudo){ alert("Entre ton pseudo !"); return; }
-
   let key = sanitizePseudo(pseudo);
   let addList = isPresent ? 'present' : 'absent';
   let removeList = isPresent ? 'absent' : 'present';
-
   db.ref(removeList + "/" + key).remove();
   db.ref(addList + "/" + key).set({name:pseudo});
-
   document.getElementById("pseudo").value="";
 }
 
-// ===== RESET ADMIN =====
-function resetPresence(){
-  if(confirm("Réinitialiser toutes les présences et absences ?")){
-    db.ref('present').remove();
-    db.ref('absent').remove();
-  }
+// ADMIN FUNCTIONS
+function loginAdmin(){
+  let id = adminId.value;
+  let pass = adminPass.value;
+  if(ADMINS.find(a=>a.id===id && a.pass===pass)){
+    isAdmin=true;
+    localStorage.setItem("admin","true");
+    updateAdminUI();
+    closePopup();
+    alert("Connexion réussie");
+  } else alert("Identifiants incorrects");
 }
+function logout(){ isAdmin=false; localStorage.removeItem("admin"); updateAdminUI(); alert("Déconnecté"); }
+function updateAdminUI(){ document.querySelectorAll(".admin").forEach(b=>b.style.display=isAdmin?"inline-block":"none"); document.querySelector(".logout").style.display=isAdmin?"inline-block":"none"; }
+function openPopup(){popup.style.display="flex";} 
+function closePopup(){popup.style.display="none";}
 
-// ===== TOURNOI =====
+// TOURNAMENT
 function createTournament(){
-let name = prompt("Nom du tournoi ?");
-let date = prompt("Date ?");
-let time = prompt("Heure ?");
-let max = prompt("Nombre de joueurs max par équipe ?");
-if(!name) return;
-tournament = {name,date,time,max};
-db.ref('tournament').set(tournament);
-sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**
-📅 Date : ${date}
-⏰ Heure : ${time}
-👥 Joueurs max / équipe : ${max}`);
+  let name = prompt("Nom du tournoi ?"), date = prompt("Date ?"), time = prompt("Heure ?"), max = prompt("Nombre de joueurs max par équipe ?");
+  if(!name) return; tournament={name,date,time,max};
+  db.ref('tournament').set(tournament);
+  sendDiscord("🏆 Nouveau tournoi",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
 }
-
 function editTournament(){
-if(!tournament){alert("Aucun tournoi"); return;}
-let name = prompt("Nom",tournament.name);
-let date = prompt("Date",tournament.date);
-let time = prompt("Heure",tournament.time);
-let max = prompt("Joueurs max",tournament.max);
-tournament = {name,date,time,max};
-db.ref('tournament').set(tournament);
-sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**
-📅 Date : ${date}
-⏰ Heure : ${time}
-👥 Joueurs max / équipe : ${max}`);
+  if(!tournament){alert("Aucun tournoi");return;}
+  let name = prompt("Nom",tournament.name), date = prompt("Date",tournament.date), time = prompt("Heure",tournament.time), max = prompt("Joueurs max",tournament.max);
+  tournament={name,date,time,max}; db.ref('tournament').set(tournament);
+  sendDiscord("✏️ Tournoi modifié",`Nom : **${name}**\n📅 Date : ${date}\n⏰ Heure : ${time}\n👥 Max/équipe : ${max}`);
+}
+function deleteTournament(){ if(!tournament){alert("Aucun tournoi");return;} if(confirm("Supprimer tournoi ?")){tournament=null; db.ref('tournament').remove(); sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé."); } }
+function removePlayer(){ let name=prompt("Pseudo à supprimer ?"); if(!name) return; let key=sanitizePseudo(name); db.ref('present/'+key).remove(); db.ref('absent/'+key).remove(); }
+function resetPresence(){ if(confirm("Réinitialiser toutes les présences/absences ?")){ db.ref('present').remove(); db.ref('absent').remove(); } }
+
+// DISCORD
+function sendDiscord(title,desc){
+  fetch(WEBHOOK,{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({content:"@ToXiC @everyone",embeds:[{title:title,description:desc+`\n📢 Appuyez sur le lien pour indiquer si vous êtes présent ou absent\nℹ️ Instructions : Cliquez sur le lien du site, entrez votre pseudo puis appuyez sur "Présent" ou "Absent".\n🔗 Accéder au site : ${SITE}`,color:65280}]})});
 }
 
-function deleteTournament(){
-if(!tournament){alert("Aucun tournoi"); return;}
-if(confirm("Supprimer tournoi ?")){
-tournament=null;
-db.ref('tournament').remove();
-sendDiscord("❌ Tournoi supprimé","Le tournoi a été supprimé.");
+// FIREBASE SYNC
+function initLists(){
+  db.ref('present').once('value',snap=>{if(!snap.exists()) db.ref('present').set({});});
+  db.ref('absent').once('value',snap=>{if(!snap.exists()) db.ref('absent').set({});});
 }
-}
+db.ref('present').on('value',snap=>{present=snap.val()||{}; render();});
+db.ref('absent').on('value',snap=>{absent=snap.val()||{}; render();});
+db.ref('tournament').on('value',snap=>{tournament=snap.val()||null; render();});
 
-// ===== SUPPRIMER JOUEUR =====
-function removePlayer(){
-let name=prompt("Pseudo à supprimer ?");
-if(!name) return;
-let key = sanitizePseudo(name);
-db.ref('present/' + key).remove();
-db.ref('absent/' + key).remove();
-}
-
-// ===== RENDER =====
-function render(){
-const presentList = document.getElementById("presentList");
-const absentList = document.getElementById("absentList");
-const presentTitle = document.getElementById("presentTitle");
-const absentTitle = document.getElementById("absentTitle");
-const tournamentDisplay = document.getElementById("tournamentDisplay");
-
-presentList.innerHTML = Object.values(present||{}).map(p=>`<li>${p.name}</li>`).join("");
-absentList.innerHTML = Object.values(absent||{}).map(p=>`<li>${p.name}</li>`).join("");
-presentTitle.textContent = `🟢 Présents (${Object.keys(present||{}).length})`;
-absentTitle.textContent = `🔴 Absents (${Object.keys(absent||{}).length})`;
-
-tournamentDisplay.innerHTML = tournament ? `<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>` : "";
-}
-
-// ===== SYNC FIREBASE =====
-db.ref('present').on('value', snapshot => {present = snapshot.val()||{}; render();});
-db.ref('absent').on('value', snapshot => {absent = snapshot.val()||{}; render();});
-db.ref('tournament').on('value', snapshot => {tournament = snapshot.val(); render();});
-
-// ===== INIT =====
+initLists();
 updateAdminUI();
 render();
-
 </script>
 </body>
 </html>
