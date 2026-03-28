@@ -33,18 +33,42 @@ filter:blur(60px);
 100%{transform:rotate(360deg) scale(1);}
 }
 
-.hero{height:40vh;display:flex;align-items:center;justify-content:center;flex-direction:column;}
-.glitch{font-size:40px;color:#00ff88;text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;}
+.hero{
+height:40vh;
+display:flex;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+}
+
+.glitch{
+font-size:40px;
+color:#00ff88;
+text-shadow:0 0 10px #00ff88,0 0 25px #00ff88;
+}
 
 .system{text-align:center;padding:20px;}
 
 input{
-padding:12px;border:none;border-radius:10px;margin:8px;width:220px;text-align:center;
+padding:12px;
+border:none;
+border-radius:10px;
+margin:8px;
+width:220px;
+text-align:center;
 }
 
 button{
-padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-size:14px;transition:0.3s;
+padding:12px 20px;
+margin:8px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:14px;
+transition:0.3s;
 }
+
+button:hover{transform:scale(1.1);}
 
 .present{background:#00ff88;}
 .absent{background:#ff0033;color:white;}
@@ -54,9 +78,13 @@ padding:12px 20px;margin:8px;border:none;border-radius:10px;cursor:pointer;font-
 .login-btn{background:#00cc66;color:black;font-weight:bold;}
 .logout{background:#ff0033;color:white;display:none;}
 
-button:hover{transform:scale(1.1);}
-
-.lists{display:flex;justify-content:center;gap:40px;margin-top:20px;flex-wrap:wrap;}
+.lists{
+display:flex;
+justify-content:center;
+gap:40px;
+margin-top:20px;
+flex-wrap:wrap;
+}
 
 .list-box{
 background:#111;
@@ -65,8 +93,6 @@ border-radius:10px;
 min-width:200px;
 border:1px solid #00ff8850;
 }
-
-#tournamentDisplay{margin-top:20px;}
 
 #popup{
 position:fixed;
@@ -87,10 +113,31 @@ border-radius:15px;
 text-align:center;
 box-shadow:0 0 20px #00ff88;
 }
+
+#maintenanceScreen{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:black;
+color:white;
+display:none;
+align-items:center;
+justify-content:center;
+flex-direction:column;
+font-size:30px;
+z-index:9999;
+}
 </style>
 </head>
 
 <body>
+
+<div id="maintenanceScreen">
+🚧 SITE EN MAINTENANCE<br>
+Merci de revenir plus tard
+</div>
 
 <section class="hero">
 <h1 class="glitch">☣️ TEAM TOXIC ☣️</h1>
@@ -114,15 +161,16 @@ box-shadow:0 0 20px #00ff88;
 <button class="admin" onclick="editTournament()">Modifier tournoi</button>
 <button class="admin" onclick="deleteTournament()">Supprimer tournoi</button>
 <button class="admin" onclick="removePlayer()">Supprimer joueur</button>
-<button class="admin" onclick="resetPresence()">Réinitialiser présences</button>
+<button class="admin" onclick="resetPresence()">Reset présences</button>
 </div>
 
 <div>
 <button class="dev" onclick="exportList()">Exporter liste</button>
 <button class="dev" onclick="copyList()">Copier liste</button>
-<button class="dev" onclick="showStats()">Voir statistiques</button>
-<button class="dev" onclick="testPlayers()">Mode test joueurs</button>
-<button class="dev" onclick="devInfo()">Infos développeur</button>
+<button class="dev" onclick="showStats()">Statistiques</button>
+<button class="dev" onclick="testPlayers()">Test joueurs</button>
+<button class="dev" onclick="enableMaintenance()">Activer maintenance</button>
+<button class="dev" onclick="disableMaintenance()">Désactiver maintenance</button>
 </div>
 
 <div id="tournamentDisplay"></div>
@@ -142,23 +190,10 @@ box-shadow:0 0 20px #00ff88;
 </div>
 </section>
 
-<div id="popup">
-<div class="popup-box">
-<h3>Connexion Admin / Dev</h3>
-
-<input type="email" id="email" placeholder="Email"><br>
-<input type="password" id="password" placeholder="Mot de passe"><br>
-
-<button onclick="login()">Connexion</button><br>
-<button onclick="closePopup()">Fermer</button>
-</div>
-</div>
-
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
 import { getFirestore, collection, doc, setDoc, deleteDoc, onSnapshot, getDocs } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
-import { getAuth, signInWithEmailAndPassword, signOut } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyBdLM-v9HlqIj2v7k1Z7idphIPyVK3GLlk",
@@ -171,224 +206,58 @@ appId:"1:870029280667:web:50a4af541bb484af79cd3e"
 
 const app=initializeApp(firebaseConfig);
 const db=getFirestore(app);
-const auth=getAuth(app);
 
-const ADMINS=[
-"jules.carton1@icloud.com",
-"corbanidonpierre3@gmail.com",
-"delavalkeke@gmail.com"
-];
-
-const DEVS=[
-"faureantonin744@gmail.com"
-];
-
-let present={},absent={},tournament=null,isAdmin=false,isDev=false;
+let present={},absent={},tournament=null;
+let maintenance=false;
 
 function sanitizePseudo(p){return p.replace(/[.#$[\]]/g,"_");}
 
 function render(){
 document.getElementById("presentList").innerHTML=Object.values(present).map(p=>`<li>${p.name}</li>`).join("");
 document.getElementById("absentList").innerHTML=Object.values(absent).map(p=>`<li>${p.name}</li>`).join("");
-
 document.getElementById("presentTitle").textContent=`🟢 Présents (${Object.keys(present).length})`;
 document.getElementById("absentTitle").textContent=`🔴 Absents (${Object.keys(absent).length})`;
-
-document.getElementById("tournamentDisplay").innerHTML=
-tournament?`<h3>🏆 ${tournament.name}</h3><p>📅 ${tournament.date} - ⏰ ${tournament.time}</p><p>👥 Max/équipe : ${tournament.max}</p>`:"";
 }
 
 async function setPresence(isPresent){
+if(maintenance){alert("Site en maintenance");return;}
 
 const pseudo=document.getElementById("pseudo").value.trim();
 if(!pseudo){alert("Entre ton pseudo");return;}
 
 const key=sanitizePseudo(pseudo);
 
-await setDoc(doc(db,isPresent?"present":"absent",key),{name:pseudo});
-await deleteDoc(doc(db,isPresent?"absent":"present",key));
+await setDoc(doc(db,isPresent?'present':'absent',key),{name:pseudo});
+await deleteDoc(doc(db,isPresent?'absent':'present',key));
 
 document.getElementById("pseudo").value="";
 }
 
-async function login(){
-
-const email=document.getElementById("email").value;
-const password=document.getElementById("password").value;
-
-try{
-
-await signInWithEmailAndPassword(auth,email,password);
-
-if(ADMINS.includes(email)) isAdmin=true;
-if(DEVS.includes(email)){isAdmin=true;isDev=true;}
-
-updateUI();
-closePopup();
-
-alert("Connexion réussie");
-
-}catch{
-alert("Erreur connexion");
+function enableMaintenance(){
+maintenance=true;
+document.getElementById("maintenanceScreen").style.display="flex";
 }
 
+function disableMaintenance(){
+maintenance=false;
+document.getElementById("maintenanceScreen").style.display="none";
 }
 
-function logout(){
-signOut(auth);
-isAdmin=false;
-isDev=false;
-updateUI();
-alert("Déconnecté");
-}
-
-function updateUI(){
-
-document.querySelectorAll(".admin")
-.forEach(b=>b.style.display=isAdmin?"inline-block":"none");
-
-document.querySelectorAll(".dev")
-.forEach(b=>b.style.display=isDev?"inline-block":"none");
-
-document.querySelector(".logout").style.display=isAdmin||isDev?"inline-block":"none";
-}
-
-function openPopup(){document.getElementById("popup").style.display="flex";}
-function closePopup(){document.getElementById("popup").style.display="none";}
-
-async function createTournament(){
-const name=prompt("Nom tournoi ?");
-const date=prompt("Date ?");
-const time=prompt("Heure ?");
-const max=prompt("Joueurs max ?");
-if(!name)return;
-tournament={name,date,time,max};
-await setDoc(doc(db,'tournament','info'),tournament);
-}
-
-async function editTournament(){
-if(!tournament)return;
-const name=prompt("Nom",tournament.name);
-const date=prompt("Date",tournament.date);
-const time=prompt("Heure",tournament.time);
-const max=prompt("Max",tournament.max);
-tournament={name,date,time,max};
-await setDoc(doc(db,'tournament','info'),tournament);
-}
-
-async function deleteTournament(){
-await deleteDoc(doc(db,'tournament','info'));
-tournament=null;
-}
-
-async function removePlayer(){
-let name=prompt("Pseudo ?");
-if(!name)return;
-let key=sanitizePseudo(name);
-await deleteDoc(doc(db,'present',key));
-await deleteDoc(doc(db,'absent',key));
-}
-
-async function resetPresence(){
-
-const pSnap=await getDocs(collection(db,'present'));
-pSnap.forEach(d=>deleteDoc(doc(db,'present',d.id)));
-
-const aSnap=await getDocs(collection(db,'absent'));
-aSnap.forEach(d=>deleteDoc(doc(db,'absent',d.id)));
-}
-
-function exportList(){
-
-let text="TEAM TOXIC\n\nPrésents:\n";
-Object.values(present).forEach(p=>{text+=p.name+"\n";});
-
-text+="\nAbsents:\n";
-Object.values(absent).forEach(p=>{text+=p.name+"\n";});
-
-const blob=new Blob([text],{type:"text/plain"});
-const a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="team-toxic-liste.txt";
-a.click();
-}
-
-function copyList(){
-
-let text="Présents:\n";
-Object.values(present).forEach(p=>{text+=p.name+"\n";});
-
-text+="\nAbsents:\n";
-Object.values(absent).forEach(p=>{text+=p.name+"\n";});
-
-navigator.clipboard.writeText(text);
-alert("Liste copiée");
-}
-
-function showStats(){
-
-let total=Object.keys(present).length+Object.keys(absent).length;
-let p=Object.keys(present).length;
-let a=Object.keys(absent).length;
-let percent=total?Math.round((p/total)*100):0;
-
-alert(
-"Total joueurs : "+total+
-"\nPrésents : "+p+
-"\nAbsents : "+a+
-"\nTaux présence : "+percent+"%"
-);
-
-}
-
-function testPlayers(){
-present["test1"]={name:"TestPlayer1"};
-present["test2"]={name:"TestPlayer2"};
-present["test3"]={name:"TestPlayer3"};
-render();
-}
-
-function devInfo(){
-alert(
-"Firebase connecté\n"+
-"Présents : "+Object.keys(present).length+
-"\nAbsents : "+Object.keys(absent).length+
-"\nTournoi actif : "+(tournament?"Oui":"Non")
-);
-}
-
-onSnapshot(collection(db,'present'),snap=>{
+onSnapshot(collection(db,"present"),snap=>{
 present={};
 snap.forEach(d=>present[d.id]=d.data());
 render();
 });
 
-onSnapshot(collection(db,'absent'),snap=>{
+onSnapshot(collection(db,"absent"),snap=>{
 absent={};
 snap.forEach(d=>absent[d.id]=d.data());
 render();
 });
 
-onSnapshot(doc(db,'tournament','info'),snap=>{
-tournament=snap.exists()?snap.data():null;
-render();
-});
-
 window.setPresence=setPresence;
-window.login=login;
-window.logout=logout;
-window.openPopup=openPopup;
-window.closePopup=closePopup;
-window.createTournament=createTournament;
-window.editTournament=editTournament;
-window.deleteTournament=deleteTournament;
-window.removePlayer=removePlayer;
-window.resetPresence=resetPresence;
-window.exportList=exportList;
-window.copyList=copyList;
-window.showStats=showStats;
-window.testPlayers=testPlayers;
-window.devInfo=devInfo;
+window.enableMaintenance=enableMaintenance;
+window.disableMaintenance=disableMaintenance;
 
 </script>
 
