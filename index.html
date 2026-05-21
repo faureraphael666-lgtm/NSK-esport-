@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- SEO GOOGLE / BING -->
+<title>NSK Esport – Rocket League & Warzone Team FR</title>
+
+<meta name="description" content="NSK Esport est une team eSport française spécialisée sur Rocket League et Warzone. Rejoins notre Discord et participe au recrutement.">
+
+<meta name="keywords" content="NSK Esport, team esport france, rocket league france, warzone team, recrutement esport, discord esport">
+
+<link rel="canonical" href="https://nsk-esport.netlify.app/">
+
+<!-- FIN SEO -->
+
+<style>
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  color: white;
+  background: black;
+  overflow-x: hidden;
+}
+
+/* BACKGROUND */
+.bg {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(120deg, #0f0c29, #302b63, #24243e);
+  background-size: 400% 400%;
+  animation: bgMove 10s infinite alternate;
+  z-index: -2;
+}
+
+@keyframes bgMove {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  backdrop-filter: blur(10px);
+  background: rgba(0, 0, 0, 0.25);
+  z-index: 1000;
+}
+
+nav .logo {
+  color: #00f7ff;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+
+.nav-links {
+  display: flex;
+  gap: 20px;
+}
+
+nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* HERO */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  position: relative;
+  padding: 120px 20px;
+}
+
+.glow {
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  background: #00f7ff;
+  filter: blur(140px);
+  opacity: 0.35;
+  animation: pulse 3s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+  100% { transform: scale(1); }
+}
+
+.hero-content {
+  position: relative;
+  z-index: 1;
+}
+
+.title {
+  font-size: 60px;
+  font-weight: bold;
+  color: #00f7ff;
+  text-shadow: 0 0 25px #00f7ff;
+}
+
+.subtitle {
+  opacity: 0.85;
+  margin: 10px 0 25px;
+}
+
+.discord-btn,
+.recruit-btn {
+  display: inline-block;
+  padding: 15px 30px;
+  border-radius: 12px;
+  text-decoration: none;
+  font-weight: bold;
+  margin: 6px;
+  transition: 0.3s;
+}
+
+.discord-btn {
+  background: #5865F2;
+  color: white;
+}
+
+.recruit-btn {
+  background: #00f7ff;
+  color: black;
+}
+
+.discord-btn:hover,
+.recruit-btn:hover {
+  transform: scale(1.05);
+}
+
+/* SECTIONS */
+section {
+  padding: 80px 20px;
+  text-align: center;
+}
+
+h2 { color: #00f7ff; }
+
+.text-box {
+  max-width: 800px;
+  margin: auto;
+  line-height: 1.7;
+  opacity: 0.9;
+}
+
+/* FORM */
+.form-container {
+  max-width: 700px;
+  margin: auto;
+  padding: 25px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 15px;
+  border: 1px solid rgba(0,247,255,0.25);
+}
+
+input, select, textarea {
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 10px;
+  border: none;
+}
+
+textarea {
+  min-height: 120px;
+}
+
+button {
+  width: 100%;
+  padding: 15px;
+  background: #00f7ff;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 10px;
+}
+
+/* CARDS */
+.card {
+  display: inline-block;
+  width: 260px;
+  margin: 10px;
+  padding: 20px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 15px;
+}
+
+/* FOOTER */
+footer {
+  text-align: center;
+  padding: 20px;
+  opacity: 0.5;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<nav>
+  <div class="logo">NSK ESPORT</div>
+
+  <div class="nav-links">
+    <a href="#discord">Discord</a>
+    <a href="#recrutement">Recrutement</a>
+  </div>
+</nav>
+
+<div class="hero">
+  <div class="glow"></div>
+
+  <div class="hero-content">
+    <div class="title">NSK ESPORT</div>
+    <div class="subtitle">Association loi 1901 • Rocket League • Warzone</div>
+
+    <a class="discord-btn" href="https://discord.gg/hc8jRWGfsU" target="_blank">Rejoindre Discord</a>
+    <a class="recruit-btn" href="#recrutement">Recrutement</a>
+  </div>
+</div>
+
+<section>
+  <h2>QUI SOMMES-NOUS</h2>
+  <div class="text-box">
+    NSK Esport est une association loi 1901 dédiée à l’esport, aux tournois et à la compétition sur Rocket League et Warzone.
+  </div>
+</section>
+
+<section>
+  <h2>NOS ACTIVITÉS</h2>
+
+  <div class="card">🏆 Tournois</div>
+  <div class="card">🎮 Training</div>
+  <div class="card">🔥 Discord actif</div>
+</section>
+
+<section id="discord">
+  <h2>DISCORD</h2>
+  <a class="discord-btn" href="https://discord.gg/fP6ucnqnn2" target="_blank">
+    Rejoindre le serveur
+  </a>
+</section>
+
+<section id="recrutement">
+  <h2>RECRUTEMENT</h2>
+
+  <div class="text-box">
+    Remplis le formulaire pour rejoindre NSK Esport.
+  </div>
+
+  <div class="form-container">
+
+    <input id="prenom" placeholder="Prénom">
+    <input id="nom" placeholder="Nom">
+    <input id="email" type="email" placeholder="Adresse e-mail">
+    <input id="age" type="number" placeholder="Âge">
+
+    <select id="jeu">
+      <option>Rocket League</option>
+      <option>Warzone</option>
+      <option>Les deux</option>
+    </select>
+
+    <input id="experience" placeholder="Depuis combien de temps tu joues ?">
+
+    <textarea id="motivation" placeholder="Pourquoi nous rejoindre ?"></textarea>
+
+    <button onclick="sendApplication()">Envoyer candidature</button>
+  </div>
+</section>
+
+<footer>
+  © 2026 NSK Esport
+</footer>
+
+<script>
+function sendApplication() {
+
+  const webhook = "TON_WEBHOOK_DISCORD_ICI";
+
+  const prenom = document.getElementById("prenom").value;
+  const nom = document.getElementById("nom").value;
+  const email = document.getElementById("email").value;
+  const age = document.getElementById("age").value;
+  const jeu = document.getElementById("jeu").value;
+  const experience = document.getElementById("experience").value;
+  const motivation = document.getElementById("motivation").value;
+
+  if (!prenom || !nom || !email || !age || !experience || !motivation) {
+    alert("Remplis tous les champs !");
+    return;
+  }
+
+  const payload = {
+    content: `📩 Nouvelle candidature NSK Esport
+
+👤 Nom: ${prenom} ${nom}
+📧 Email: ${email}
+🎂 Âge: ${age}
+🎮 Jeu: ${jeu}
+⏱ Expérience: ${experience}
+💬 Motivation: ${motivation}`
+  };
+
+  fetch(webhook, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  });
+
+  alert("Candidature envoyée !");
+}
+</script>
+
+</body>
+</html>
