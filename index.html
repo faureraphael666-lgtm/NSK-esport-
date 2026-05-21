@@ -4,229 +4,87 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>NSK Esport – Rocket League & Warzone</title>
+<title>NSK Esport</title>
 
 <style>
 
-/* ========================= */
-/* BASE */
-/* ========================= */
-
-*{
-  box-sizing:border-box;
-}
-
 body{
   margin:0;
-  overflow-x:hidden;
-  font-family:Arial,sans-serif;
-  color:white;
+  font-family:Arial;
   background:black;
+  color:white;
+  overflow-x:hidden;
 }
 
-/* ========================= */
 /* BACKGROUND */
-/* ========================= */
 
 .bg{
   position:fixed;
   inset:0;
-  background:
-  radial-gradient(circle at 20% 20%, rgba(255,0,0,0.15), transparent 35%),
-  radial-gradient(circle at 80% 80%, rgba(255,255,255,0.05), transparent 40%),
-  linear-gradient(135deg,#000,#070707,#120000);
+  background:radial-gradient(circle at 20% 20%, rgba(255,0,0,0.2), transparent 40%),
+             radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08), transparent 40%),
+             linear-gradient(135deg,#000,#111,#200000);
   z-index:-10;
 }
 
-/* ========================= */
-/* FUMÉE BLANCHE */
-/* ========================= */
-
-.smoke{
-  position:fixed;
-  inset:0;
-  z-index:-9;
-  pointer-events:none;
-}
+/* SMOKE */
 
 .smoke span{
-  position:absolute;
-  width:700px;
-  height:700px;
-  background:radial-gradient(circle, rgba(255,255,255,0.10), transparent 70%);
+  position:fixed;
+  width:600px;
+  height:600px;
+  background:radial-gradient(circle, rgba(255,255,255,0.12), transparent 70%);
   filter:blur(90px);
   border-radius:50%;
-  animation:smokeMove 18s infinite alternate ease-in-out;
+  animation:move 18s infinite alternate;
+  z-index:-9;
 }
 
 .smoke span:nth-child(1){top:-200px;left:-200px;}
-.smoke span:nth-child(2){bottom:-250px;right:-200px;animation-duration:25s;}
-.smoke span:nth-child(3){top:40%;left:60%;animation-duration:22s;}
+.smoke span:nth-child(2){bottom:-200px;right:-200px;}
 
-@keyframes smokeMove{
-  0%{transform:translate(0,0) scale(1);}
-  100%{transform:translate(150px,100px) scale(1.4);}
+@keyframes move{
+  0%{transform:translate(0,0);}
+  100%{transform:translate(120px,80px);}
 }
 
-/* ========================= */
-/* ÉTOILES */
-/* ========================= */
-
-.stars{
-  position:fixed;
-  inset:0;
-  z-index:-8;
-}
-
-.star{
-  position:absolute;
-  width:2px;
-  height:2px;
-  background:white;
-  border-radius:50%;
-  opacity:0.7;
-  animation:twinkle 3s infinite alternate;
-}
-
-@keyframes twinkle{
-  0%{opacity:0.2; transform:scale(1);}
-  100%{opacity:1; transform:scale(1.5);}
-}
-
-/* ========================= */
-/* SHOOTING STARS */
-/* ========================= */
-
-.shooting-star{
-  position:fixed;
-  width:2px;
-  height:90px;
-  background:linear-gradient(white,transparent);
-  transform:rotate(45deg);
-  opacity:0;
-  animation:shoot 3s linear forwards;
-  z-index:-7;
-}
-
-@keyframes shoot{
-  0%{transform:translate(0,0) rotate(45deg);opacity:1;}
-  100%{transform:translate(-600px,600px) rotate(45deg);opacity:0;}
-}
-
-/* ========================= */
-/* NAV */
-/* ========================= */
-
-nav{
-  position:fixed;
-  top:0;
-  width:100%;
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:15px 30px;
-  background:rgba(0,0,0,0.45);
-  backdrop-filter:blur(10px);
-  z-index:1000;
-  border-bottom:1px solid rgba(255,0,0,0.2);
-}
-
-nav .logo{
-  color:#ff1e1e;
-  font-weight:bold;
-  letter-spacing:2px;
-}
-
-nav a{
-  color:white;
-  text-decoration:none;
-  margin-left:15px;
-}
-
-nav a:hover{
-  color:#ff1e1e;
-}
-
-/* ========================= */
 /* HERO */
-/* ========================= */
 
 .hero{
-  min-height:100vh;
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
   text-align:center;
-  padding:120px 20px;
 }
 
 .title{
-  font-size:70px;
-  font-weight:bold;
-  text-shadow:0 0 25px rgba(255,0,0,0.5);
+  font-size:60px;
+  color:#ff1e1e;
 }
 
-.subtitle{
-  opacity:0.8;
-  margin:10px 0 25px;
-}
+/* BUTTON */
 
 .btn{
   display:inline-block;
-  padding:15px 30px;
-  border-radius:12px;
+  padding:15px 25px;
+  margin:10px;
+  border-radius:10px;
   text-decoration:none;
   font-weight:bold;
-  margin:8px;
-  transition:0.3s;
 }
 
-.btn:hover{
-  transform:scale(1.05);
-}
+.red{background:#ff1e1e;color:white;}
+.white{background:white;color:black;}
 
-.red{
-  background:#ff1e1e;
-  color:white;
-}
-
-.white{
-  background:white;
-  color:black;
-}
-
-/* ========================= */
-/* SECTIONS */
-/* ========================= */
-
-section{
-  padding:80px 20px;
-  text-align:center;
-}
-
-h2{
-  color:#ff1e1e;
-  font-size:35px;
-}
-
-/* ========================= */
 /* FORM */
-/* ========================= */
-
-.form{
-  max-width:600px;
-  margin:auto;
-  padding:20px;
-  background:rgba(255,255,255,0.05);
-  border-radius:15px;
-}
 
 input,textarea,select{
   width:100%;
   padding:12px;
-  margin:8px 0;
+  margin:6px 0;
   border:none;
-  border-radius:10px;
+  border-radius:8px;
   background:#111;
   color:white;
 }
@@ -235,10 +93,14 @@ button{
   width:100%;
   padding:15px;
   background:#ff1e1e;
-  color:white;
   border:none;
+  color:white;
   cursor:pointer;
-  font-weight:bold;
+}
+
+section{
+  padding:80px 20px;
+  text-align:center;
 }
 
 </style>
@@ -246,152 +108,72 @@ button{
 
 <body>
 
-<!-- BACKGROUND -->
 <div class="bg"></div>
 
-<!-- SMOKE -->
 <div class="smoke">
   <span></span>
   <span></span>
-  <span></span>
 </div>
-
-<!-- STARS -->
-<div class="stars" id="stars"></div>
-
-<!-- NAV -->
-<nav>
-  <div class="logo">NSK ESPORT</div>
-  <div>
-    <a href="#discord">Discord</a>
-    <a href="#recrutement">Recrutement</a>
-  </div>
-</nav>
 
 <!-- HERO -->
 <div class="hero">
   <div>
     <div class="title">NSK ESPORT</div>
-    <div class="subtitle">Rocket League • Warzone • Roblox</div>
 
-    <a class="btn red" href="https://discord.gg/hc8jRWGfsU" target="_blank">Rejoindre Discord</a>
-    <a class="btn white" href="#recrutement">Recrutement</a>
+    <a class="btn red" href="https://discord.gg/hc8jRWGfsU" target="_blank">Discord</a>
+    <a class="btn white" href="#form">Recrutement</a>
   </div>
 </div>
 
-<!-- ABOUT -->
-<section>
-  <h2>QUI SOMMES-NOUS</h2>
-  Team compétitive NSK Esport
+<!-- FORM -->
+<section id="form">
+
+<h2>Recrutement</h2>
+
+<input id="prenom" placeholder="Prénom">
+<input id="nom" placeholder="Nom">
+<input id="email" placeholder="Email">
+<input id="age" placeholder="Âge">
+<input id="jeu" placeholder="Jeu">
+<textarea id="motivation" placeholder="Motivation"></textarea>
+
+<button onclick="send()">Envoyer</button>
+
 </section>
-
-<!-- DISCORD -->
-<section id="discord">
-  <h2>DISCORD</h2>
-  <a class="btn red" href="https://discord.gg/fP6ucnqnn2" target="_blank">Rejoindre serveur</a>
-</section>
-
-<!-- RECRUTEMENT -->
-<section id="recrutement">
-  <h2>RECRUTEMENT</h2>
-
-  <div class="form">
-    <input id="prenom" placeholder="Prénom">
-    <input id="nom" placeholder="Nom">
-    <input id="email" type="email" placeholder="Email">
-    <input id="age" type="number" placeholder="Âge">
-
-    <select id="jeu">
-      <option>Rocket League</option>
-      <option>Warzone</option>
-      <option>Les deux</option>
-    </select>
-
-    <input id="experience" placeholder="Expérience">
-    <textarea id="motivation" placeholder="Motivation"></textarea>
-
-    <button onclick="sendApplication()">Envoyer candidature</button>
-  </div>
-</section>
-
-<footer style="text-align:center;padding:25px;opacity:0.6;">
-© 2026 NSK Esport
-</footer>
 
 <script>
 
-/* ========================= */
-/* STARS */
-/* ========================= */
+function send(){
 
-const stars = document.getElementById("stars");
-
-for(let i=0;i<120;i++){
-  let s = document.createElement("div");
-  s.className = "star";
-  s.style.top = Math.random()*100 + "%";
-  s.style.left = Math.random()*100 + "%";
-  s.style.animationDuration = (1+Math.random()*3)+"s";
-  stars.appendChild(s);
-}
-
-/* ========================= */
-/* SHOOTING STARS */
-/* ========================= */
-
-function shoot(){
-  const star = document.createElement("div");
-  star.className = "shooting-star";
-
-  star.style.top = Math.random()*50 + "%";
-  star.style.left = Math.random()*100 + "%";
-
-  document.body.appendChild(star);
-
-  setTimeout(()=>star.remove(),3000);
-}
-
-setInterval(shoot, 2500);
-
-/* ========================= */
-/* DISCORD WEBHOOK SYSTEM */
-/* ========================= */
-
-function sendApplication(){
-
-  const webhook = "https://discord.com/api/webhooks/1506483965413032107/k1KphgLv_5pKCzHgfcS82pTZb_V40XuLT6BqN6eInsf4kWGcQfcyy00uJ0DDMsR5kGWo"; // 🔴 mets ton vrai webhook ici
+  const webhook = "https://discord.com/api/webhooks/1506483965413032107/k1KphgLv_5pKCzHgfcS82pTZb_V40XuLT6BqN6eInsf4kWGcQfcyy00uJ0DDMsR5kGWo";
 
   const prenom = document.getElementById("prenom").value;
   const nom = document.getElementById("nom").value;
   const email = document.getElementById("email").value;
   const age = document.getElementById("age").value;
   const jeu = document.getElementById("jeu").value;
-  const experience = document.getElementById("experience").value;
   const motivation = document.getElementById("motivation").value;
 
-  if(!prenom || !nom || !email || !age || !experience || !motivation){
-    alert("Remplis tous les champs !");
+  if(!prenom || !nom || !email || !age || !jeu || !motivation){
+    alert("Remplis tout !");
     return;
   }
 
   fetch(webhook,{
     method:"POST",
-    headers:{
-      "Content-Type":"application/json"
-    },
+    headers:{"Content-Type":"application/json"},
     body:JSON.stringify({
-      content:`📩 Nouvelle candidature NSK Esport
+      content:`📩 NSK CANDIDATURE
 
 👤 ${prenom} ${nom}
 📧 ${email}
 🎂 ${age}
 🎮 ${jeu}
-⏱ ${experience}
 💬 ${motivation}`
     })
   });
 
-  alert("Candidature envoyée !");
+  alert("Envoyé !");
 }
 
 </script>
