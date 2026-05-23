@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>NSK Esport – Warzone Team FR</title>
+
+<!-- ========================= -->
+<!-- SEO GOOGLE / BING -->
+<!-- ========================= -->
+
+<meta name="description" content="🎮 NSK ESPORT
+
+Bienvenue dans NSK Esport, une team gaming compétitive et communautaire basée sur Rocket League ⚽🚗 et Warzone 🔫.
+
+Nous sommes une structure motivée par la progression, la performance et l’esprit d’équipe. NSK Esport, c’est avant tout une communauté soudée où chaque joueur a sa place, que ce soit pour tryhard en ranked ou jouer en équipe dans une bonne ambiance.
+
+⸻
+
+🔥 NOS OBJECTIFS
+• Former une équipe solide et active
+• Progresser ensemble sur Rocket League et Warzone
+• Participer à des matchs, scrims et événements
+• Créer une vraie identité esport NSK
+
+⸻
+
+🧠 NOTRE PHILOSOPHIE
+• Respect entre tous les membres
+• Esprit d’équipe avant tout
+• Motivation et amélioration continue
+• Bonne ambiance + sérieux en game
+
+⸻
+
+🎯 RECRUTEMENT
+NSK Esport recrute des joueurs motivés qui veulent évoluer et s’investir dans une team organisée.
+
+Peu importe ton niveau actuel, ce qui compte c’est la motivation, la régularité et l’esprit d’équipe.
+
+⸻
+
+📊 NOS JEUX PRINCIPAUX
+⚽ Rocket League
+🔫 Warzone
+🧱 Roblox (casual / non-esport)
+
+⸻
+
+👑 REJOINS L’AVENTURE
+Si tu veux faire partie d’une team structurée, active et ambitieuse, alors NSK Esport t’ouvre ses portes.
+ Recrutement ouvert.">
+<meta name="keywords" content="NSK Esport, Warzone, Esport France, Call of Duty, Team Gaming">
+<meta name="robots" content="index, follow">
+<meta name="author" content="NSK Esport">
+
+<link rel="canonical" href="https://nsk-esport.netlify.app/">
+
+<meta property="og:title" content="NSK Esport - Warzone Team FR">
+<meta property="og:description" content="Rejoins NSK Esport, structure Warzone compétitive française.">
+
+<style>
+
+/* ========================= */
+/* BASE */
+/* ========================= */
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html{
+  scroll-behavior:smooth;
+}
+
+body{
+  font-family:Arial;
+  background:black;
+  color:white;
+  overflow-x:hidden;
+}
+
+/* ========================= */
+/* LOADER */
+/* ========================= */
+
+.loader{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  z-index:99999;
+}
+
+.loader h1{
+  color:#ff1e1e;
+  font-size:50px;
+  text-shadow:0 0 20px red;
+}
+
+.bar{
+  width:300px;
+  height:6px;
+  background:#222;
+  margin-top:20px;
+  border-radius:10px;
+  overflow:hidden;
+}
+
+.fill{
+  width:0%;
+  height:100%;
+  background:#ff1e1e;
+}
+
+/* ========================= */
+/* BACKGROUND */
+/* ========================= */
+
+.bg{
+  position:fixed;
+  inset:0;
+  z-index:-10;
+  background:
+  radial-gradient(circle at 20% 20%, rgba(255,0,0,0.15), transparent 40%),
+  linear-gradient(135deg,#000,#0a0a0a,#120000);
+}
+
+/* STARS */
+
+.stars{
+  position:fixed;
+  inset:0;
+  z-index:999;
+  pointer-events:none;
+}
+
+.star{
+  position:absolute;
+  width:2px;
+  height:2px;
+  background:white;
+  border-radius:50%;
+  animation:blink 2s infinite alternate;
+}
+
+@keyframes blink{
+  0%{opacity:0.2;}
+  100%{opacity:1;}
+}
+
+/* ========================= */
+/* NAV */
+/* ========================= */
+
+nav{
+  position:fixed;
+  top:0;
+  width:100%;
+  display:flex;
+  justify-content:space-between;
+  padding:15px 20px;
+  background:rgba(0,0,0,0.6);
+  z-index:1000;
+  backdrop-filter:blur(10px);
+}
+
+.logo{
+  color:#ff1e1e;
+  font-weight:bold;
+}
+
+/* BUTTONS */
+
+.btn{
+  padding:10px 15px;
+  border-radius:10px;
+  text-decoration:none;
+  font-weight:bold;
+  margin-left:5px;
+}
+
+.red{background:#ff1e1e;color:white;}
+.white{background:white;color:black;}
+
+/* ========================= */
+/* HERO */
+/* ========================= */
+
+.hero{
+  min-height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  text-align:center;
+  padding-top:100px;
+}
+
+.title{
+  font-size:70px;
+  color:#ff1e1e;
+  text-shadow:0 0 25px rgba(255,0,0,0.6);
+}
+
+/* ========================= */
+/* SECTION */
+/* ========================= */
+
+section{
+  padding:80px 20px;
+  text-align:center;
+}
+
+h2{
+  color:#ff1e1e;
+  margin-bottom:20px;
+}
+
+/* DESCRIPTION BOX */
+
+.box{
+  max-width:900px;
+  margin:auto;
+  padding:25px;
+  background:rgba(255,255,255,0.05);
+  border-radius:15px;
+  line-height:1.7;
+}
+
+/* ROSTERS */
+
+.roster-container{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:20px;
+}
+
+.roster{
+  width:250px;
+  padding:20px;
+  background:rgba(255,255,255,0.05);
+  border:1px solid rgba(255,0,0,0.3);
+  border-radius:15px;
+}
+
+.player{
+  background:black;
+  padding:8px;
+  margin:5px 0;
+  border-radius:8px;
+}
+
+/* FORM */
+
+input,textarea{
+  width:100%;
+  padding:12px;
+  margin:6px 0;
+  border-radius:10px;
+  border:none;
+  background:#111;
+  color:white;
+  outline:none;
+}
+
+input.error, textarea.error{
+  border:2px solid red;
+}
+
+button{
+  width:100%;
+  padding:14px;
+  background:#ff1e1e;
+  border:none;
+  border-radius:10px;
+  color:white;
+  cursor:pointer;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<!-- LOADER -->
+<div class="loader" id="loader">
+  <h1>NSK ESPORT</h1>
+  <div class="bar"><div class="fill" id="fill"></div></div>
+</div>
+
+<!-- BACKGROUND -->
+<div class="bg"></div>
+
+<!-- STARS -->
+<div class="stars" id="stars"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">NSK ESPORT</div>
+
+  <div>
+    <a class="btn red" href="https://discord.gg/hc8jRWGfsU" target="_blank">Discord</a>
+    <a class="btn white" href="#recrutement">Recrutement</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<div class="hero">
+  <div>
+    <div class="title">NSK ESPORT</div>
+  </div>
+</div>
+
+<!-- DESCRIPTION -->
+<section>
+
+<h2>QUI SOMMES-NOUS</h2>
+
+<div class="box">
+NSK Esport est une structure compétitive française spécialisée sur Warzone.<br><br>
+Nous sommes une équipe axée sur la performance, la communication et le teamplay.<br><br>
+Notre objectif est de devenir une structure sérieuse et active dans l’esport.
+</div>
+
+</section>
+
+<!-- ROSTERS -->
+<section>
+
+<h2>ROSTERS WARZONE</h2>
+
+<div class="roster-container">
+
+<div class="roster">
+<h3>Roster 1</h3>
+<div class="player">Joueur 1</div>
+<div class="player">Joueur 2</div>
+<div class="player">Joueur 3</div>
+</div>
+
+<div class="roster">
+<h3>Roster 2</h3>
+<div class="player">Joueur 1</div>
+<div class="player">Joueur 2</div>
+<div class="player">Joueur 3</div>
+</div>
+
+<div class="roster">
+<h3>Roster 3</h3>
+<div class="player">Joueur 1</div>
+<div class="player">Joueur 2</div>
+<div class="player">Joueur 3</div>
+</div>
+
+</div>
+
+</section>
+
+<!-- RECRUTEMENT -->
+<section id="recrutement">
+
+<h2>RECRUTEMENT</h2>
+
+<input id="prenom" placeholder="Prénom">
+<input id="nom" placeholder="Nom">
+<input id="email" placeholder="Email">
+<input id="age" placeholder="Âge">
+<textarea id="motivation" placeholder="Motivation"></textarea>
+
+<button onclick="send()">Envoyer candidature</button>
+
+</section>
+
+<script>
+
+/* LOADER */
+let p=0;
+const fill=document.getElementById("fill");
+
+const load=setInterval(()=>{
+p+=3;
+fill.style.width=p+"%";
+
+if(p>=100){
+clearInterval(load);
+document.getElementById("loader").style.display="none";
+}
+},20);
+
+/* STARS */
+const stars=document.getElementById("stars");
+
+for(let i=0;i<120;i++){
+const s=document.createElement("div");
+s.className="star";
+s.style.top=Math.random()*100+"%";
+s.style.left=Math.random()*100+"%";
+stars.appendChild(s);
+}
+
+/* WEBHOOK + VALIDATION */
+function send(){
+
+const webhook="https://discord.com/api/webhooks/1506483965413032107/k1KphgLv_5pKCzHgfcS82pTZb_V40XuLT6BqN6eInsf4kWGcQfcyy00uJ0DDMsR5kGWo";
+
+const fields=[
+document.getElementById("prenom"),
+document.getElementById("nom"),
+document.getElementById("email"),
+document.getElementById("age"),
+document.getElementById("motivation")
+];
+
+let valid=true;
+
+fields.forEach(f=>{
+if(!f.value.trim()){
+f.classList.add("error");
+valid=false;
+}else{
+f.classList.remove("error");
+}
+});
+
+if(!valid){
+alert("⚠️ Merci de remplir tous les champs !");
+return;
+}
+
+fetch(webhook,{
+method:"POST",
+headers:{"Content-Type":"application/json"},
+body:JSON.stringify({
+content:`📩 NSK ESPORT CANDIDATURE
+
+👤 ${fields[0].value} ${fields[1].value}
+📧 ${fields[2].value}
+🎂 ${fields[3].value}
+💬 ${fields[4].value}`
+})
+});
+
+alert("✅ Candidature envoyée !");
+}
+
+</script>
+
+</body>
+</html>
